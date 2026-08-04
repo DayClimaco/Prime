@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Prime Translado</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
@@ -436,7 +436,12 @@
     todosVouchers = await listarVouchers();
     estadoCarregando.style.display = 'none';
     renderizarTabela();
-    renderizarGraficoDestinos(todosVouchers);
+
+    try {
+      renderizarGraficoDestinos(todosVouchers);
+    } catch (erroGrafico) {
+      console.error('Gráfico de destinos falhou (lista de vouchers carregou normalmente):', erroGrafico);
+    }
   } catch (erro) {
     console.error(erro);
     estadoCarregando.style.display = 'none';
