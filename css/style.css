@@ -3,12 +3,13 @@
    aqui só o que é comum (reset básico + paleta). */
 
 :root {
-  --cor-primaria: #1F7A99;
-  --cor-primaria-escura: #16576d;
+  --cor-primaria: #14213D;
+  --cor-primaria-escura: #0D1730;
+  --cor-dourado: #D4A64A;
   --cor-sucesso: #2c974b;
   --cor-erro: #a02020;
   --cor-texto: #222222;
-  --cor-fundo: #f4f6f8;
+  --cor-fundo: #F4F3EF;
 }
 
 * {
