@@ -3,15 +3,15 @@
 // Carrega /templates/voucher-template.html, popula com os dados de um
 // voucher e exporta em PDF — 100% no client, sem backend.
 //
-// Usa html2canvas + jsPDF diretamente (ambos vêm dentro do bundle do
-// html2pdf.js, só não usamos a função html2pdf() em si — a paginação
-// automática dela cortava/embaralhava o voucher em vez de gerar uma
-// página só do tamanho certo).
+// Usa html2canvas + jsPDF diretamente (cada um com seu próprio script,
+// não o bundle do html2pdf.js — esse empacota as duas libs escondidas
+// dentro dele e não expõe window.html2canvas/window.jspdf).
 //
-// Pré-requisito: a página que importar este módulo precisa incluir
-// o script (via CDN) — continua sendo o mesmo de sempre:
+// Pré-requisito: a página que importar este módulo precisa incluir,
+// nessa ordem, ANTES do jsPDF/html2canvas serem usados:
 //
-//   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+//   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+//   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 //
 // Uso:
 //   import { gerarPDF } from './pdf-generator.js';
@@ -149,13 +149,13 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   }
   if (typeof window.html2canvas !== 'function') {
     throw new Error(
-      'html2canvas não encontrado. Inclua o script do html2pdf.js via CDN na página antes de chamar gerarPDF().'
+      'html2canvas não encontrado. Inclua o script https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js na página antes de chamar gerarPDF().'
     );
   }
   const JsPDFConstructor = window.jspdf?.jsPDF || window.jsPDF;
   if (typeof JsPDFConstructor !== 'function') {
     throw new Error(
-      'jsPDF não encontrado. Inclua o script do html2pdf.js via CDN na página antes de chamar gerarPDF().'
+      'jsPDF não encontrado. Inclua o script https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js na página antes de chamar gerarPDF().'
     );
   }
 
