@@ -361,9 +361,7 @@
 
   /* ---------- Pill de seção ---------- */
   .pill-secao {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    display: inline-block;
     background: #14213D;
     color: #fff;
     font-size: 13px;
@@ -372,10 +370,21 @@
     padding: 7px 16px;
     border-radius: 20px;
     margin: 4px 0 12px 0;
+    white-space: nowrap;
+  }
+
+  .pill-secao .icone {
+    vertical-align: middle;
+    margin-right: 6px;
+    margin-top: -2px;
   }
 
   .pill-secao.escura {
     background: linear-gradient(90deg, #14213D, #1D3160);
+  }
+
+  .rotulo-pill, .data-destaque {
+    vertical-align: middle;
   }
 
   .data-destaque {
