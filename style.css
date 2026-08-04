@@ -1,0 +1,31 @@
+/* style.css — regras globais compartilhadas por todas as páginas.
+   Estilos específicos de cada tela ficam no <style> de cada .html;
+   aqui só o que é comum (reset básico + paleta). */
+
+:root {
+  --cor-primaria: #1F7A99;
+  --cor-primaria-escura: #16576d;
+  --cor-sucesso: #2c974b;
+  --cor-erro: #a02020;
+  --cor-texto: #222222;
+  --cor-fundo: #f4f6f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  color: var(--cor-texto);
+}
+
+a {
+  color: var(--cor-primaria);
+}
+
+::selection {
+  background: var(--cor-primaria);
+  color: #fff;
+}
