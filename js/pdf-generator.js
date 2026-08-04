@@ -1,11 +1,15 @@
 // pdf-generator.js
 // ---------------------------------------------------------------------
 // Carrega /templates/voucher-template.html, popula com os dados de um
-// voucher e exporta em PDF usando html2pdf.js — 100% no client, sem
-// backend.
+// voucher e exporta em PDF — 100% no client, sem backend.
+//
+// Usa html2canvas + jsPDF diretamente (ambos vêm dentro do bundle do
+// html2pdf.js, só não usamos a função html2pdf() em si — a paginação
+// automática dela cortava/embaralhava o voucher em vez de gerar uma
+// página só do tamanho certo).
 //
 // Pré-requisito: a página que importar este módulo precisa incluir
-// o script do html2pdf antes (via CDN):
+// o script (via CDN) — continua sendo o mesmo de sempre:
 //
 //   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 //
@@ -143,9 +147,15 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   if (tipo !== 'agencia' && tipo !== 'cliente') {
     throw new Error("tipo deve ser 'agencia' ou 'cliente'");
   }
-  if (typeof window.html2pdf !== 'function') {
+  if (typeof window.html2canvas !== 'function') {
     throw new Error(
-      'html2pdf.js não encontrado. Inclua o script via CDN na página antes de chamar gerarPDF().'
+      'html2canvas não encontrado. Inclua o script do html2pdf.js via CDN na página antes de chamar gerarPDF().'
+    );
+  }
+  const JsPDFConstructor = window.jspdf?.jsPDF || window.jsPDF;
+  if (typeof JsPDFConstructor !== 'function') {
+    throw new Error(
+      'jsPDF não encontrado. Inclua o script do html2pdf.js via CDN na página antes de chamar gerarPDF().'
     );
   }
 
@@ -159,44 +169,35 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   const voucherRoot = container.querySelector('#voucher-root');
   const nomeArquivo = `voucher-${voucher.numero}-${tipo}.pdf`;
 
-  // Espera as fontes (Poppins/Dancing Script) carregarem antes de medir.
-  // Sem isso, a altura pode ser calculada com a fonte de fallback e não
-  // bater com o que é realmente desenhado no PDF — causa clássica de
-  // conteúdo cortado ou faltando no rodapé.
+  // Espera as fontes (Poppins/Dancing Script) carregarem antes de
+  // renderizar. Sem isso, o layout pode mudar de tamanho no meio do
+  // processo (fonte de fallback -> fonte real) e distorcer o resultado.
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
-  // pequena pausa extra pra garantir que o navegador já reaplicou o
-  // layout depois da troca de fonte
   await new Promise((resolve) => setTimeout(resolve, 80));
 
-  // Gera a página do PDF no tamanho EXATO do voucher (em vez de forçar
-  // A4). Isso evita que o rodapé (aviso final, motorista/veículo etc.)
-  // fique cortado entre duas páginas quando o conteúdo varia de altura
-  // (ex: versão "cliente" sem a linha do valor). getBoundingClientRect
-  // dá a medida exata (com decimais); arredondamos pra cima e somamos
-  // uma margem de segurança pra não cortar por 1-2px de arredondamento.
-  const retangulo = voucherRoot.getBoundingClientRect();
-  const larguraPx = Math.ceil(retangulo.width);
-  const alturaPx = Math.ceil(retangulo.height) + 6;
-
-  const opcoes = {
-    margin: 0,
-    filename: nomeArquivo,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
+  try {
+    // 1) Desenha o voucher inteiro numa única imagem (canvas).
+    const canvas = await window.html2canvas(voucherRoot, {
       scale: 2,
       useCORS: true,
-      windowWidth: larguraPx,
       scrollX: 0,
       scrollY: 0,
-    },
-    jsPDF: { unit: 'px', format: [larguraPx, alturaPx], orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all'] },
-  };
+    });
 
-  try {
-    await window.html2pdf().set(opcoes).from(voucherRoot).save();
+    // 2) Cria um PDF com UMA página do tamanho EXATO da imagem gerada
+    // (em pixels do próprio canvas). Isso evita completamente a lógica
+    // de "fatiar em várias páginas" do html2pdf.js, que é o que estava
+    // cortando/embaralhando o voucher.
+    const imagemBase64 = canvas.toDataURL('image/jpeg', 0.98);
+    const pdf = new JsPDFConstructor({
+      orientation: 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height],
+    });
+    pdf.addImage(imagemBase64, 'JPEG', 0, 0, canvas.width, canvas.height);
+    pdf.save(nomeArquivo);
   } finally {
     container.remove();
   }
