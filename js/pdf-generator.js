@@ -159,12 +159,20 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   const voucherRoot = container.querySelector('#voucher-root');
   const nomeArquivo = `voucher-${voucher.numero}-${tipo}.pdf`;
 
+  // Gera a página do PDF no tamanho EXATO do voucher (em vez de forçar
+  // A4). Isso evita que o rodapé (aviso final, motorista/veículo etc.)
+  // fique cortado entre duas páginas quando o conteúdo varia de altura
+  // (ex: versão "cliente" sem a linha do valor).
+  const larguraPx = voucherRoot.offsetWidth;
+  const alturaPx = voucherRoot.offsetHeight;
+
   const opcoes = {
     margin: 0,
     filename: nomeArquivo,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    jsPDF: { unit: 'px', format: [larguraPx, alturaPx], orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all'] },
   };
 
   try {
