@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Prime Translado</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-login {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  }
+
+  .card-login h1 {
+    font-size: 19px;
+    text-align: center;
+    margin: 0 0 4px 0;
+    color: #1F7A99;
+  }
+
+  .card-login .subtitulo {
+    text-align: center;
+    font-size: 12.5px;
+    color: #777;
+    margin-bottom: 22px;
+  }
+
+  .campo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  input {
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-family: inherit;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 11px;
+    border-radius: 6px;
+    border: none;
+    background: #1F7A99;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    background: #9bbfcb;
+    cursor: not-allowed;
+  }
+
+  .mensagem-erro {
+    margin-top: 14px;
+    padding: 10px 12px;
+    background: #fbeaea;
+    border: 1px solid #e6a5a5;
+    border-radius: 6px;
+    color: #a02020;
+    font-size: 13px;
+    display: none;
+  }
+
+  .mensagem-erro.mostrar {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div class="card-login">
+  <h1>PRIME TRANSLADO</h1>
+  <div class="subtitulo">Acesso ao sistema de vouchers</div>
+
+  <form id="form-login">
+    <div class="campo-form">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required autocomplete="username">
+    </div>
+    <div class="campo-form">
+      <label for="senha">Senha</label>
+      <input type="password" id="senha" name="senha" required autocomplete="current-password">
+    </div>
+    <button type="submit" id="btn-entrar">Entrar</button>
+    <div class="mensagem-erro" id="mensagem-erro"></div>
+  </form>
+</div>
+
+<script type="module">
+  import { login, getSession } from '/js/auth.js';
+
+  const form = document.getElementById('form-login');
+  const btnEntrar = document.getElementById('btn-entrar');
+  const divErro = document.getElementById('mensagem-erro');
+
+  // Se já tem sessão ativa, não precisa logar de novo
+  const sessaoAtual = await getSession();
+  if (sessaoAtual) {
+    window.location.href = '/dashboard.html';
+  }
+
+  form.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    divErro.classList.remove('mostrar');
+    btnEntrar.disabled = true;
+    btnEntrar.textContent = 'Entrando...';
+
+    try {
+      await login(
+        document.getElementById('email').value.trim(),
+        document.getElementById('senha').value
+      );
+      window.location.href = '/dashboard.html';
+    } catch (erro) {
+      console.error(erro);
+      divErro.textContent = 'Email ou senha inválidos.';
+      divErro.classList.add('mostrar');
+      btnEntrar.disabled = false;
+      btnEntrar.textContent = 'Entrar';
+    }
+  });
+</script>
+</body>
+</html>

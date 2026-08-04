@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Voucher — Prime Translado</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  /* Estilos específicos desta página. Regras genéricas (cores, fontes
+     base) ficam em /css/style.css */
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 24px;
+  }
+
+  .pagina {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  form {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  fieldset {
+    border: none;
+    border-top: 1px solid #e2e2e2;
+    padding: 16px 0;
+    margin: 0 0 4px 0;
+  }
+
+  fieldset:first-of-type {
+    border-top: none;
+  }
+
+  legend {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 0;
+    color: #1F7A99;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .campo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .campo-form.full {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  input, select, textarea {
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  .transportador-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .transportador-preview img {
+    max-height: 48px;
+    max-width: 90px;
+    object-fit: contain;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 2px;
+    background: #fff;
+  }
+
+  .acoes {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  button {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  #btn-salvar {
+    background: #1F7A99;
+    color: #fff;
+  }
+
+  #btn-salvar:disabled {
+    background: #9bbfcb;
+    cursor: not-allowed;
+  }
+
+  .resultado {
+    margin-top: 20px;
+    padding: 16px;
+    background: #eaf6ea;
+    border: 1px solid #b7dfb7;
+    border-radius: 6px;
+    display: none;
+  }
+
+  .resultado.mostrar {
+    display: block;
+  }
+
+  .resultado .botoes-pdf {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .botoes-pdf button {
+    background: #2c974b;
+    color: #fff;
+  }
+
+  .botoes-pdf button.cliente {
+    background: #555;
+  }
+
+  .mensagem-erro {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: #fbeaea;
+    border: 1px solid #e6a5a5;
+    border-radius: 6px;
+    color: #a02020;
+    display: none;
+  }
+
+  .mensagem-erro.mostrar {
+    display: block;
+  }
+</style>
+</head>
+<body>
+<div class="pagina">
+  <h1>Novo Voucher</h1>
+
+  <form id="form-voucher">
+
+    <fieldset>
+      <legend>Transportador</legend>
+      <div class="campo-form full">
+        <label for="transportador_id">Transportador</label>
+        <select id="transportador_id" name="transportador_id" required></select>
+        <div class="transportador-preview" id="preview-transportador"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Dados do cliente</legend>
+      <div class="grid">
+        <div class="campo-form">
+          <label for="cliente_nome">Nome</label>
+          <input type="text" id="cliente_nome" name="cliente_nome" required>
+        </div>
+        <div class="campo-form">
+          <label for="cliente_telefone">Telefone</label>
+          <input type="text" id="cliente_telefone" name="cliente_telefone">
+        </div>
+        <div class="campo-form">
+          <label for="agencia_nome">Agência</label>
+          <input type="text" id="agencia_nome" name="agencia_nome">
+        </div>
+        <div class="campo-form">
+          <label for="valor">Valor R$</label>
+          <input type="number" step="0.01" id="valor" name="valor">
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:12px;">
+        <div class="campo-form">
+          <label for="num_adultos">N° Adultos</label>
+          <input type="number" min="0" id="num_adultos" name="num_adultos" value="1" required>
+        </div>
+        <div class="campo-form">
+          <label for="num_criancas">CHD (crianças)</label>
+          <input type="number" min="0" id="num_criancas" name="num_criancas" value="0">
+        </div>
+        <div class="campo-form">
+          <label for="num_bebes">INF (bebês)</label>
+          <input type="number" min="0" id="num_bebes" name="num_bebes" value="0">
+        </div>
+      </div>
+      <div class="campo-form full" style="margin-top:12px;">
+        <label for="servico_descricao">Serviço</label>
+        <textarea id="servico_descricao" name="servico_descricao" placeholder="Ex: Serviço de Translado Aeroporto do Recife - Porto de Galinhas Ipojuca."></textarea>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Data da ida</legend>
+      <div class="grid-3">
+        <div class="campo-form">
+          <label for="data_ida">Data</label>
+          <input type="date" id="data_ida" name="data_ida">
+        </div>
+        <div class="campo-form">
+          <label for="horario_ida">Horário</label>
+          <input type="time" id="horario_ida" name="horario_ida">
+        </div>
+        <div class="campo-form">
+          <label for="voo_ida">Voo/Apt</label>
+          <input type="text" id="voo_ida" name="voo_ida">
+        </div>
+        <div class="campo-form">
+          <label for="origem_ida">Origem</label>
+          <input type="text" id="origem_ida" name="origem_ida">
+        </div>
+        <div class="campo-form">
+          <label for="destino_ida">Destino</label>
+          <input type="text" id="destino_ida" name="destino_ida">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Data da volta</legend>
+      <div class="grid-3">
+        <div class="campo-form">
+          <label for="data_volta">Data</label>
+          <input type="date" id="data_volta" name="data_volta">
+        </div>
+        <div class="campo-form">
+          <label for="horario_volta">Horário</label>
+          <input type="time" id="horario_volta" name="horario_volta">
+        </div>
+        <div class="campo-form">
+          <label for="voo_volta">Voo/Apt</label>
+          <input type="text" id="voo_volta" name="voo_volta">
+        </div>
+        <div class="campo-form">
+          <label for="origem_volta">Origem</label>
+          <input type="text" id="origem_volta" name="origem_volta">
+        </div>
+        <div class="campo-form">
+          <label for="destino_volta">Destino</label>
+          <input type="text" id="destino_volta" name="destino_volta">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Observações e atendimento</legend>
+      <div class="campo-form full">
+        <label for="observacoes">Observações</label>
+        <textarea id="observacoes" name="observacoes"></textarea>
+      </div>
+      <div class="grid" style="margin-top:12px;">
+        <div class="campo-form">
+          <label for="atendente">Atendente</label>
+          <input type="text" id="atendente" name="atendente">
+        </div>
+        <div class="campo-form">
+          <label for="data_atendimento">Data do atendimento</label>
+          <input type="date" id="data_atendimento" name="data_atendimento">
+        </div>
+        <div class="campo-form">
+          <label for="motorista">Motorista</label>
+          <input type="text" id="motorista" name="motorista">
+        </div>
+        <div class="campo-form">
+          <label for="veiculo">Veículo</label>
+          <input type="text" id="veiculo" name="veiculo">
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="acoes">
+      <button type="submit" id="btn-salvar">Salvar voucher</button>
+    </div>
+
+    <div class="mensagem-erro" id="mensagem-erro"></div>
+
+    <div class="resultado" id="resultado">
+      <strong>Voucher n° <span id="resultado-numero"></span> salvo com sucesso!</strong>
+      <div class="botoes-pdf">
+        <button type="button" id="btn-pdf-agencia">Gerar voucher (agência)</button>
+        <button type="button" id="btn-pdf-cliente" class="cliente">Gerar voucher (cliente)</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script type="module">
+  import { requireAuth } from '/js/auth.js';
+  import { listarTransportadores, buscarOuCriarCliente, criarVoucher } from '/js/voucher.js';
+  import { gerarPDF } from '/js/pdf-generator.js';
+
+  await requireAuth(); // redireciona pro login se não houver sessão
+
+  const form = document.getElementById('form-voucher');
+  const selectTransportador = document.getElementById('transportador_id');
+  const previewTransportador = document.getElementById('preview-transportador');
+  const btnSalvar = document.getElementById('btn-salvar');
+  const divResultado = document.getElementById('resultado');
+  const spanNumero = document.getElementById('resultado-numero');
+  const divErro = document.getElementById('mensagem-erro');
+  const btnPdfAgencia = document.getElementById('btn-pdf-agencia');
+  const btnPdfCliente = document.getElementById('btn-pdf-cliente');
+
+  let transportadores = [];
+  let voucherSalvo = null; // guarda o voucher recém-criado pra gerar o PDF
+
+  function mostrarErro(mensagem) {
+    divErro.textContent = mensagem;
+    divErro.classList.add('mostrar');
+  }
+
+  function limparErro() {
+    divErro.classList.remove('mostrar');
+    divErro.textContent = '';
+  }
+
+  function atualizarPreviewTransportador() {
+    const selecionado = transportadores.find(t => t.id === selectTransportador.value);
+    previewTransportador.innerHTML = '';
+    if (selecionado?.logo_url) {
+      const img = document.createElement('img');
+      img.src = selecionado.logo_url;
+      img.alt = selecionado.nome;
+      previewTransportador.appendChild(img);
+    }
+  }
+
+  async function carregarTransportadores() {
+    transportadores = await listarTransportadores();
+    selectTransportador.innerHTML = transportadores
+      .map(t => `<option value="${t.id}">${t.nome}${t.is_padrao ? ' (padrão)' : ''}</option>`)
+      .join('');
+    atualizarPreviewTransportador();
+  }
+
+  selectTransportador.addEventListener('change', atualizarPreviewTransportador);
+
+  form.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    limparErro();
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = 'Salvando...';
+
+    try {
+      const clienteId = await buscarOuCriarCliente({
+        nome: document.getElementById('cliente_nome').value.trim(),
+        telefone: document.getElementById('cliente_telefone').value.trim() || null,
+      });
+
+      const dadosVoucher = {
+        cliente_id: clienteId,
+        transportador_id: selectTransportador.value,
+        agencia_nome: document.getElementById('agencia_nome').value.trim() || null,
+        num_adultos: Number(document.getElementById('num_adultos').value || 0),
+        num_criancas: Number(document.getElementById('num_criancas').value || 0),
+        num_bebes: Number(document.getElementById('num_bebes').value || 0),
+        valor: document.getElementById('valor').value || null,
+        servico_descricao: document.getElementById('servico_descricao').value.trim() || null,
+        data_ida: document.getElementById('data_ida').value || null,
+        origem_ida: document.getElementById('origem_ida').value.trim() || null,
+        destino_ida: document.getElementById('destino_ida').value.trim() || null,
+        horario_ida: document.getElementById('horario_ida').value || null,
+        voo_ida: document.getElementById('voo_ida').value.trim() || null,
+        data_volta: document.getElementById('data_volta').value || null,
+        origem_volta: document.getElementById('origem_volta').value.trim() || null,
+        destino_volta: document.getElementById('destino_volta').value.trim() || null,
+        horario_volta: document.getElementById('horario_volta').value || null,
+        voo_volta: document.getElementById('voo_volta').value.trim() || null,
+        observacoes: document.getElementById('observacoes').value.trim() || null,
+        atendente: document.getElementById('atendente').value.trim() || null,
+        data_atendimento: document.getElementById('data_atendimento').value || null,
+        motorista: document.getElementById('motorista').value.trim() || null,
+        veiculo: document.getElementById('veiculo').value.trim() || null,
+      };
+
+      voucherSalvo = await criarVoucher(dadosVoucher);
+
+      spanNumero.textContent = voucherSalvo.numero;
+      divResultado.classList.add('mostrar');
+    } catch (erro) {
+      console.error(erro);
+      mostrarErro('Não foi possível salvar o voucher: ' + erro.message);
+    } finally {
+      btnSalvar.disabled = false;
+      btnSalvar.textContent = 'Salvar voucher';
+    }
+  });
+
+  btnPdfAgencia.addEventListener('click', async () => {
+    if (!voucherSalvo) return;
+    btnPdfAgencia.disabled = true;
+    try {
+      await gerarPDF(voucherSalvo, 'agencia');
+    } catch (erro) {
+      console.error(erro);
+      mostrarErro('Erro ao gerar PDF (agência): ' + erro.message);
+    } finally {
+      btnPdfAgencia.disabled = false;
+    }
+  });
+
+  btnPdfCliente.addEventListener('click', async () => {
+    if (!voucherSalvo) return;
+    btnPdfCliente.disabled = true;
+    try {
+      await gerarPDF(voucherSalvo, 'cliente');
+    } catch (erro) {
+      console.error(erro);
+      mostrarErro('Erro ao gerar PDF (cliente): ' + erro.message);
+    } finally {
+      btnPdfCliente.disabled = false;
+    }
+  });
+
+  carregarTransportadores().catch((erro) => {
+    console.error(erro);
+    mostrarErro('Não foi possível carregar os transportadores: ' + erro.message);
+  });
+</script>
+</body>
+</html>

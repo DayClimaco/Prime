@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Prime Translado</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 24px;
+  }
+
+  .pagina {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .topo h1 {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .topo .acoes-topo {
+    display: flex;
+    gap: 10px;
+  }
+
+  a.btn, button {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primario {
+    background: #1F7A99;
+    color: #fff;
+  }
+
+  .btn-secundario {
+    background: #eee;
+    color: #333;
+  }
+
+  .filtros {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+  }
+
+  .filtros input {
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+  }
+
+  .filtros input#busca {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .tabela-container {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+
+  th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: #444;
+  }
+
+  tr:hover td {
+    background: #fafcfd;
+  }
+
+  .col-acoes {
+    display: flex;
+    gap: 6px;
+  }
+
+  .col-acoes button {
+    padding: 6px 10px;
+    font-size: 12px;
+    background: #2c974b;
+    color: #fff;
+  }
+
+  .col-acoes button.cliente {
+    background: #555;
+  }
+
+  .col-acoes button:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+  }
+
+  .estado-vazio, .estado-carregando {
+    padding: 40px;
+    text-align: center;
+    color: #888;
+  }
+
+  .mensagem-erro {
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    background: #fbeaea;
+    border: 1px solid #e6a5a5;
+    border-radius: 6px;
+    color: #a02020;
+    display: none;
+  }
+
+  .mensagem-erro.mostrar {
+    display: block;
+  }
+
+  .badge-transportador {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #e6f2f6;
+    color: #1F7A99;
+    font-size: 12px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<div class="pagina">
+
+  <div class="topo">
+    <h1>Vouchers</h1>
+    <div class="acoes-topo">
+      <a class="btn btn-primario" href="/novo-voucher.html">+ Novo voucher</a>
+      <button class="btn-secundario" id="btn-sair">Sair</button>
+    </div>
+  </div>
+
+  <div class="mensagem-erro" id="mensagem-erro"></div>
+
+  <div class="filtros">
+    <input type="text" id="busca" placeholder="Buscar por cliente, agência ou transportador...">
+    <input type="date" id="filtro-data-de" title="Data da ida, a partir de">
+    <input type="date" id="filtro-data-ate" title="Data da ida, até">
+  </div>
+
+  <div class="tabela-container">
+    <div class="estado-carregando" id="estado-carregando">Carregando vouchers...</div>
+    <table id="tabela-vouchers" style="display:none;">
+      <thead>
+        <tr>
+          <th>N°</th>
+          <th>Cliente</th>
+          <th>Agência</th>
+          <th>Transportador</th>
+          <th>Data ida</th>
+          <th>Data volta</th>
+          <th>Valor</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="corpo-tabela"></tbody>
+    </table>
+    <div class="estado-vazio" id="estado-vazio" style="display:none;">Nenhum voucher encontrado.</div>
+  </div>
+
+</div>
+
+<script type="module">
+  import { requireAuth, logout } from '/js/auth.js';
+  import { listarVouchers } from '/js/voucher.js';
+  import { gerarPDF } from '/js/pdf-generator.js';
+
+  await requireAuth();
+
+  const inputBusca = document.getElementById('busca');
+  const inputDataDe = document.getElementById('filtro-data-de');
+  const inputDataAte = document.getElementById('filtro-data-ate');
+  const corpoTabela = document.getElementById('corpo-tabela');
+  const tabela = document.getElementById('tabela-vouchers');
+  const estadoCarregando = document.getElementById('estado-carregando');
+  const estadoVazio = document.getElementById('estado-vazio');
+  const divErro = document.getElementById('mensagem-erro');
+  const btnSair = document.getElementById('btn-sair');
+
+  let todosVouchers = [];
+
+  function mostrarErro(mensagem) {
+    divErro.textContent = mensagem;
+    divErro.classList.add('mostrar');
+  }
+
+  function formatarDataBr(dataISO) {
+    if (!dataISO) return '—';
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function formatarValor(valor) {
+    if (valor === null || valor === undefined) return '—';
+    return 'R$ ' + Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  function vouchersFiltrados() {
+    const termo = inputBusca.value.trim().toLowerCase();
+    const dataDe = inputDataDe.value || null;
+    const dataAte = inputDataAte.value || null;
+
+    return todosVouchers.filter((v) => {
+      if (termo) {
+        const alvo = [
+          v.cliente?.nome,
+          v.agencia_nome,
+          v.transportador?.nome,
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (!alvo.includes(termo)) return false;
+      }
+      if (dataDe && (!v.data_ida || v.data_ida < dataDe)) return false;
+      if (dataAte && (!v.data_ida || v.data_ida > dataAte)) return false;
+      return true;
+    });
+  }
+
+  function renderizarTabela() {
+    const lista = vouchersFiltrados();
+    corpoTabela.innerHTML = '';
+
+    if (lista.length === 0) {
+      tabela.style.display = 'none';
+      estadoVazio.style.display = 'block';
+      return;
+    }
+
+    estadoVazio.style.display = 'none';
+    tabela.style.display = 'table';
+
+    for (const voucher of lista) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${voucher.numero}</td>
+        <td>${voucher.cliente?.nome ?? '—'}</td>
+        <td>${voucher.agencia_nome ?? '—'}</td>
+        <td><span class="badge-transportador">${voucher.transportador?.nome ?? '—'}</span></td>
+        <td>${formatarDataBr(voucher.data_ida)}</td>
+        <td>${formatarDataBr(voucher.data_volta)}</td>
+        <td>${formatarValor(voucher.valor)}</td>
+        <td>
+          <div class="col-acoes">
+            <button data-id="${voucher.id}" data-tipo="agencia">PDF agência</button>
+            <button data-id="${voucher.id}" data-tipo="cliente" class="cliente">PDF cliente</button>
+          </div>
+        </td>
+      `;
+      corpoTabela.appendChild(tr);
+    }
+
+    corpoTabela.querySelectorAll('button[data-tipo]').forEach((botao) => {
+      botao.addEventListener('click', async () => {
+        const id = botao.dataset.id;
+        const tipo = botao.dataset.tipo;
+        const voucher = todosVouchers.find((v) => v.id === id);
+        if (!voucher) return;
+
+        botao.disabled = true;
+        const textoOriginal = botao.textContent;
+        botao.textContent = 'Gerando...';
+
+        try {
+          await gerarPDF(voucher, tipo);
+        } catch (erro) {
+          console.error(erro);
+          mostrarErro(`Erro ao gerar PDF: ${erro.message}`);
+        } finally {
+          botao.disabled = false;
+          botao.textContent = textoOriginal;
+        }
+      });
+    });
+  }
+
+  [inputBusca, inputDataDe, inputDataAte].forEach((el) => {
+    el.addEventListener('input', renderizarTabela);
+  });
+
+  btnSair.addEventListener('click', () => logout());
+
+  try {
+    todosVouchers = await listarVouchers();
+    estadoCarregando.style.display = 'none';
+    renderizarTabela();
+  } catch (erro) {
+    console.error(erro);
+    estadoCarregando.style.display = 'none';
+    mostrarErro('Não foi possível carregar os vouchers: ' + erro.message);
+  }
+</script>
+</body>
+</html>
