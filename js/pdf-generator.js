@@ -159,18 +159,38 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   const voucherRoot = container.querySelector('#voucher-root');
   const nomeArquivo = `voucher-${voucher.numero}-${tipo}.pdf`;
 
+  // Espera as fontes (Poppins/Dancing Script) carregarem antes de medir.
+  // Sem isso, a altura pode ser calculada com a fonte de fallback e não
+  // bater com o que é realmente desenhado no PDF — causa clássica de
+  // conteúdo cortado ou faltando no rodapé.
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+  // pequena pausa extra pra garantir que o navegador já reaplicou o
+  // layout depois da troca de fonte
+  await new Promise((resolve) => setTimeout(resolve, 80));
+
   // Gera a página do PDF no tamanho EXATO do voucher (em vez de forçar
   // A4). Isso evita que o rodapé (aviso final, motorista/veículo etc.)
   // fique cortado entre duas páginas quando o conteúdo varia de altura
-  // (ex: versão "cliente" sem a linha do valor).
-  const larguraPx = voucherRoot.offsetWidth;
-  const alturaPx = voucherRoot.offsetHeight;
+  // (ex: versão "cliente" sem a linha do valor). getBoundingClientRect
+  // dá a medida exata (com decimais); arredondamos pra cima e somamos
+  // uma margem de segurança pra não cortar por 1-2px de arredondamento.
+  const retangulo = voucherRoot.getBoundingClientRect();
+  const larguraPx = Math.ceil(retangulo.width);
+  const alturaPx = Math.ceil(retangulo.height) + 6;
 
   const opcoes = {
     margin: 0,
     filename: nomeArquivo,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      windowWidth: larguraPx,
+      scrollX: 0,
+      scrollY: 0,
+    },
     jsPDF: { unit: 'px', format: [larguraPx, alturaPx], orientation: 'portrait' },
     pagebreak: { mode: ['avoid-all'] },
   };
