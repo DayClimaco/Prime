@@ -217,6 +217,57 @@
     font-size: 12px;
     font-weight: 700;
   }
+
+  /* ---------- Responsivo (celular) ---------- */
+  @media (max-width: 640px) {
+    body {
+      padding: 12px;
+    }
+
+    .topo {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .topo h1 {
+      font-size: 19px;
+    }
+
+    .topo .acoes-topo {
+      width: 100%;
+    }
+
+    .topo .acoes-topo a.btn,
+    .topo .acoes-topo button {
+      flex: 1;
+      text-align: center;
+    }
+
+    .filtros {
+      flex-direction: column;
+    }
+
+    .filtros input#busca,
+    .filtros input[type="date"] {
+      width: 100%;
+    }
+
+    .grafico-container {
+      padding: 14px;
+    }
+
+    /* A tabela continua rolando de lado (já preparada pra isso);
+       só deixamos texto e espaçamento mais compactos */
+    th, td {
+      padding: 8px 10px;
+      font-size: 12.5px;
+    }
+
+    .col-acoes {
+      flex-wrap: nowrap;
+    }
+  }
 </style>
 </head>
 <body>

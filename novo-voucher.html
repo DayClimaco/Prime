@@ -234,6 +234,57 @@
   .mensagem-erro.mostrar {
     display: block;
   }
+
+  /* ---------- Responsivo (celular) ---------- */
+  @media (max-width: 640px) {
+    body {
+      padding: 12px;
+    }
+
+    .topo-pagina {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    h1 {
+      font-size: 19px;
+    }
+
+    form {
+      padding: 16px;
+      border-radius: 10px;
+    }
+
+    .grid, .grid-3 {
+      grid-template-columns: 1fr;
+    }
+
+    input, select, textarea {
+      font-size: 16px; /* evita zoom automático do iOS ao focar campo */
+    }
+
+    .acoes {
+      flex-direction: column;
+    }
+
+    .acoes button, .btn-voltar {
+      width: 100%;
+      text-align: center;
+    }
+
+    .botoes-pdf {
+      flex-direction: column;
+    }
+
+    .botoes-pdf button {
+      width: 100%;
+    }
+
+    .transportador-preview img {
+      max-height: 40px;
+    }
+  }
 </style>
 </head>
 <body>
