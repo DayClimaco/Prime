@@ -112,7 +112,8 @@
     <!-- DATA DA IDA -->
     <div class="pill-secao escura">
       <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-gold"><use href="#ic-calendar" xlink:href="#ic-calendar"></use></svg>
-      DATA DA IDA: <span class="data-destaque" data-field="data_ida" id="data-ida"></span>
+      <span class="rotulo-pill">DATA DA IDA:</span>
+      <span class="data-destaque" data-field="data_ida" id="data-ida"></span>
     </div>
     <table class="trajeto-tabela">
       <thead>
@@ -136,7 +137,8 @@
     <!-- DATA DA VOLTA -->
     <div class="pill-secao escura">
       <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-gold"><use href="#ic-calendar" xlink:href="#ic-calendar"></use></svg>
-      DATA DA VOLTA: <span class="data-destaque" data-field="data_volta" id="data-volta"></span>
+      <span class="rotulo-pill">DATA DA VOLTA:</span>
+      <span class="data-destaque" data-field="data_volta" id="data-volta"></span>
     </div>
     <table class="trajeto-tabela">
       <thead>
@@ -379,6 +381,10 @@
   .data-destaque {
     color: #F0C97A;
     margin-left: 4px;
+  }
+
+  .rotulo-pill {
+    white-space: nowrap;
   }
 
   /* ---------- Lista de dados do cliente ---------- */
