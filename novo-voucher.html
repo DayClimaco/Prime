@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,11 +8,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --navy: #14213D;
+    --navy-2: #1D3160;
+    --gold: #D4A64A;
+    --gold-light: #F0C97A;
+  }
+
   /* Estilos específicos desta página. Regras genéricas (cores, fontes
      base) ficam em /css/style.css */
   body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    background: #F4F3EF;
     margin: 0;
     padding: 24px;
   }
@@ -21,21 +31,41 @@
     margin: 0 auto;
   }
 
+  .topo-pagina {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
   h1 {
     font-size: 22px;
-    margin-bottom: 20px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--navy);
+  }
+
+  .btn-voltar {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--navy);
+    text-decoration: none;
+    border: 1px solid #e2e2e2;
   }
 
   form {
     background: #ffffff;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: 0 2px 10px rgba(20,33,61,0.08);
   }
 
   fieldset {
     border: none;
-    border-top: 1px solid #e2e2e2;
+    border-top: 1px solid #eee;
     padding: 16px 0;
     margin: 0 0 4px 0;
   }
@@ -46,10 +76,14 @@
 
   legend {
     font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 10px;
-    padding: 0;
-    color: #1F7A99;
+    font-size: 13px;
+    letter-spacing: 0.3px;
+    margin-bottom: 12px;
+    padding: 4px 12px;
+    color: #fff;
+    background: var(--navy);
+    border-radius: 14px;
+    display: inline-block;
   }
 
   .grid {
@@ -83,9 +117,15 @@
   input, select, textarea {
     font-size: 14px;
     padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold);
   }
 
   textarea {
@@ -120,32 +160,41 @@
     font-size: 14px;
     font-weight: 700;
     padding: 10px 18px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
+    transition: background 0.15s;
   }
 
   #btn-salvar {
-    background: #1F7A99;
+    background: var(--navy);
     color: #fff;
   }
 
+  #btn-salvar:hover:not(:disabled) {
+    background: var(--navy-2);
+  }
+
   #btn-salvar:disabled {
-    background: #9bbfcb;
+    background: #9aa3b5;
     cursor: not-allowed;
   }
 
   .resultado {
     margin-top: 20px;
-    padding: 16px;
-    background: #eaf6ea;
-    border: 1px solid #b7dfb7;
-    border-radius: 6px;
+    padding: 18px;
+    background: linear-gradient(135deg, #fff, #FBF3E2);
+    border: 1px solid var(--gold-light);
+    border-radius: 10px;
     display: none;
   }
 
   .resultado.mostrar {
     display: block;
+  }
+
+  .resultado strong {
+    color: var(--navy);
   }
 
   .resultado .botoes-pdf {
@@ -155,12 +204,21 @@
   }
 
   .botoes-pdf button {
-    background: #2c974b;
+    background: var(--navy);
     color: #fff;
   }
 
+  .botoes-pdf button:hover {
+    background: var(--navy-2);
+  }
+
   .botoes-pdf button.cliente {
-    background: #555;
+    background: var(--gold);
+    color: #fff;
+  }
+
+  .botoes-pdf button.cliente:hover {
+    background: #c39640;
   }
 
   .mensagem-erro {
@@ -180,7 +238,10 @@
 </head>
 <body>
 <div class="pagina">
-  <h1>Novo Voucher</h1>
+  <div class="topo-pagina">
+    <h1 id="titulo-pagina">Novo Voucher</h1>
+    <a class="btn-voltar" href="/dashboard.html">&larr; Voltar ao dashboard</a>
+  </div>
 
   <form id="form-voucher">
 
@@ -330,12 +391,20 @@
 
 <script type="module">
   import { requireAuth } from '/js/auth.js';
-  import { listarTransportadores, buscarOuCriarCliente, criarVoucher } from '/js/voucher.js';
+  import {
+    listarTransportadores,
+    buscarOuCriarCliente,
+    atualizarCliente,
+    criarVoucher,
+    atualizarVoucher,
+    buscarVoucher,
+  } from '/js/voucher.js';
   import { gerarPDF } from '/js/pdf-generator.js';
 
   await requireAuth(); // redireciona pro login se não houver sessão
 
   const form = document.getElementById('form-voucher');
+  const tituloPagina = document.getElementById('titulo-pagina');
   const selectTransportador = document.getElementById('transportador_id');
   const previewTransportador = document.getElementById('preview-transportador');
   const btnSalvar = document.getElementById('btn-salvar');
@@ -345,8 +414,45 @@
   const btnPdfAgencia = document.getElementById('btn-pdf-agencia');
   const btnPdfCliente = document.getElementById('btn-pdf-cliente');
 
+  // Modo de edição: se a URL tiver ?id=xxxx, estamos editando um
+  // voucher existente em vez de criar um novo.
+  const idEdicao = new URLSearchParams(window.location.search).get('id');
+  let clienteIdEdicao = null;
+
   let transportadores = [];
-  let voucherSalvo = null; // guarda o voucher recém-criado pra gerar o PDF
+  let voucherSalvo = null; // guarda o voucher recém-criado/editado pra gerar o PDF
+
+  /**
+   * Preenche o formulário inteiro com os dados de um voucher existente
+   * (usado no modo de edição).
+   */
+  function preencherFormulario(voucher) {
+    document.getElementById('cliente_nome').value = voucher.cliente?.nome || '';
+    document.getElementById('cliente_telefone').value = voucher.cliente?.telefone || '';
+    document.getElementById('agencia_nome').value = voucher.agencia_nome || '';
+    document.getElementById('valor').value = voucher.valor ?? '';
+    document.getElementById('num_adultos').value = voucher.num_adultos ?? 1;
+    document.getElementById('num_criancas').value = voucher.num_criancas ?? 0;
+    document.getElementById('num_bebes').value = voucher.num_bebes ?? 0;
+    document.getElementById('servico_descricao').value = voucher.servico_descricao || '';
+    document.getElementById('data_ida').value = voucher.data_ida || '';
+    document.getElementById('origem_ida').value = voucher.origem_ida || '';
+    document.getElementById('destino_ida').value = voucher.destino_ida || '';
+    document.getElementById('horario_ida').value = voucher.horario_ida || '';
+    document.getElementById('voo_ida').value = voucher.voo_ida || '';
+    document.getElementById('data_volta').value = voucher.data_volta || '';
+    document.getElementById('origem_volta').value = voucher.origem_volta || '';
+    document.getElementById('destino_volta').value = voucher.destino_volta || '';
+    document.getElementById('horario_volta').value = voucher.horario_volta || '';
+    document.getElementById('voo_volta').value = voucher.voo_volta || '';
+    document.getElementById('observacoes').value = voucher.observacoes || '';
+    document.getElementById('atendente').value = voucher.atendente || '';
+    document.getElementById('data_atendimento').value = voucher.data_atendimento || '';
+    document.getElementById('motorista').value = voucher.motorista || '';
+    document.getElementById('veiculo').value = voucher.veiculo || '';
+    selectTransportador.value = voucher.transportador_id;
+    atualizarPreviewTransportador();
+  }
 
   function mostrarErro(mensagem) {
     divErro.textContent = mensagem;
@@ -386,10 +492,20 @@
     btnSalvar.textContent = 'Salvando...';
 
     try {
-      const clienteId = await buscarOuCriarCliente({
-        nome: document.getElementById('cliente_nome').value.trim(),
-        telefone: document.getElementById('cliente_telefone').value.trim() || null,
-      });
+      let clienteId;
+      if (idEdicao && clienteIdEdicao) {
+        // Edição: atualiza o cliente já vinculado em vez de criar outro
+        clienteId = clienteIdEdicao;
+        await atualizarCliente(clienteId, {
+          nome: document.getElementById('cliente_nome').value.trim(),
+          telefone: document.getElementById('cliente_telefone').value.trim() || null,
+        });
+      } else {
+        clienteId = await buscarOuCriarCliente({
+          nome: document.getElementById('cliente_nome').value.trim(),
+          telefone: document.getElementById('cliente_telefone').value.trim() || null,
+        });
+      }
 
       const dadosVoucher = {
         cliente_id: clienteId,
@@ -417,7 +533,11 @@
         veiculo: document.getElementById('veiculo').value.trim() || null,
       };
 
-      voucherSalvo = await criarVoucher(dadosVoucher);
+      if (idEdicao) {
+        voucherSalvo = await atualizarVoucher(idEdicao, dadosVoucher);
+      } else {
+        voucherSalvo = await criarVoucher(dadosVoucher);
+      }
 
       spanNumero.textContent = voucherSalvo.numero;
       divResultado.classList.add('mostrar');
@@ -426,7 +546,7 @@
       mostrarErro('Não foi possível salvar o voucher: ' + erro.message);
     } finally {
       btnSalvar.disabled = false;
-      btnSalvar.textContent = 'Salvar voucher';
+      btnSalvar.textContent = idEdicao ? 'Salvar alterações' : 'Salvar voucher';
     }
   });
 
@@ -456,9 +576,21 @@
     }
   });
 
-  carregarTransportadores().catch((erro) => {
+  async function iniciar() {
+    await carregarTransportadores();
+
+    if (idEdicao) {
+      tituloPagina.textContent = 'Editar Voucher';
+      btnSalvar.textContent = 'Salvar alterações';
+      const voucherExistente = await buscarVoucher(idEdicao);
+      clienteIdEdicao = voucherExistente.cliente_id;
+      preencherFormulario(voucherExistente);
+    }
+  }
+
+  iniciar().catch((erro) => {
     console.error(erro);
-    mostrarErro('Não foi possível carregar os transportadores: ' + erro.message);
+    mostrarErro('Não foi possível carregar os dados: ' + erro.message);
   });
 </script>
 </body>
