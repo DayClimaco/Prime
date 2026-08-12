@@ -77,6 +77,29 @@
     border: 1px solid #e2e2e2;
   }
 
+  .nav-abas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .nav-abas a {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid #e2e2e2;
+  }
+
+  .nav-abas a.ativa {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+
   .filtros {
     background: #ffffff;
     border-radius: 12px;
@@ -279,6 +302,11 @@
       <a class="btn btn-primario" href="/novo-voucher.html">+ Novo voucher</a>
       <button class="btn-secundario" id="btn-sair">Sair</button>
     </div>
+  </div>
+
+  <div class="nav-abas">
+    <a href="/dashboard.html" class="ativa">Vouchers</a>
+    <a href="/agendamento.html">Agenda</a>
   </div>
 
   <div class="mensagem-erro" id="mensagem-erro"></div>
