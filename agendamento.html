@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda — Prime Translado</title>
+<link rel="stylesheet" href="/css/style.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --navy: #14213D;
+    --navy-2: #1D3160;
+    --gold: #D4A64A;
+    --gold-light: #F0C97A;
+  }
+
+  body {
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    background: #F4F3EF;
+    margin: 0;
+    padding: 24px;
+  }
+
+  .pagina {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .topo h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--navy);
+  }
+
+  .topo .acoes-topo {
+    display: flex;
+    gap: 10px;
+  }
+
+  a.btn, button {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s;
+    font-family: inherit;
+  }
+
+  .btn-primario {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  .btn-primario:hover {
+    background: var(--navy-2);
+  }
+
+  .btn-secundario {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid #e2e2e2;
+  }
+
+  /* ---------- Abas de navegação ---------- */
+  .nav-abas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .nav-abas a {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid #e2e2e2;
+  }
+
+  .nav-abas a.ativa {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+
+  /* ---------- Filtros da agenda ---------- */
+  .filtros-agenda {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(20,33,61,0.08);
+    flex-wrap: wrap;
+  }
+
+  .filtros-agenda select {
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    min-width: 220px;
+  }
+
+  .navegacao-mes {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .navegacao-mes button {
+    background: var(--navy);
+    color: #fff;
+    padding: 6px 12px;
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .navegacao-mes button:hover {
+    background: var(--navy-2);
+  }
+
+  .navegacao-mes span {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 15px;
+    min-width: 150px;
+    text-align: center;
+    text-transform: capitalize;
+  }
+
+  /* ---------- Legenda ---------- */
+  .legenda {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: #555;
+  }
+
+  .legenda span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ponto {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .ponto.agendado { background: var(--gold); }
+  .ponto.voucher { background: var(--navy); }
+
+  /* ---------- Calendário ---------- */
+  .calendario-container {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(20,33,61,0.08);
+  }
+
+  .calendario-cabecalho-dias {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 6px;
+  }
+
+  .calendario-cabecalho-dias div {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    padding: 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+  }
+
+  .dia-celula {
+    min-height: 84px;
+    border-radius: 8px;
+    background: #F8F8F6;
+    border: 1px solid #eee;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: default;
+  }
+
+  .dia-celula.vazia {
+    background: transparent;
+    border: none;
+  }
+
+  .dia-celula.com-evento {
+    cursor: pointer;
+    border-color: var(--gold-light);
+  }
+
+  .dia-celula.com-evento:hover {
+    background: #FBF7EE;
+  }
+
+  .dia-celula.hoje {
+    border: 1.5px solid var(--navy);
+  }
+
+  .dia-numero {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .dia-marcadores {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10.5px;
+  }
+
+  .dia-marcadores .marcador {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #444;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .estado-vazio-calendario {
+    padding: 30px;
+    text-align: center;
+    color: #888;
+    font-size: 13.5px;
+  }
+
+  /* ---------- Painel do dia (lateral deslizante) ---------- */
+  .painel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,33,61,0.35);
+    z-index: 50;
+  }
+
+  .painel-overlay.aberto {
+    display: block;
+  }
+
+  .painel-dia {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 380px;
+    max-width: 92vw;
+    background: #fff;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+    padding: 22px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .painel-dia-cabecalho {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .painel-dia-cabecalho h3 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 17px;
+    text-transform: capitalize;
+  }
+
+  .painel-fechar {
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+
+  .item-agenda {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .item-agenda .item-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .item-agenda .item-nome {
+    font-weight: 700;
+    color: var(--navy);
+    font-size: 14px;
+  }
+
+  .badge-status {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .badge-status.agendado {
+    background: #FBF0DA;
+    color: #8a6415;
+  }
+
+  .badge-status.convertido {
+    background: #E3F2E6;
+    color: #2c7a3f;
+  }
+
+  .badge-status.voucher {
+    background: #E9EDF7;
+    color: var(--navy);
+  }
+
+  .item-agenda .item-detalhe {
+    font-size: 12.5px;
+    color: #555;
+    margin-bottom: 3px;
+  }
+
+  .item-agenda .item-acoes {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .item-agenda .item-acoes button,
+  .item-agenda .item-acoes a {
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  .btn-gerar-voucher {
+    background: var(--gold);
+    color: #fff;
+  }
+
+  .btn-gerar-voucher:hover { background: #c39640; }
+
+  .btn-editar-item {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--navy) !important;
+  }
+
+  .btn-excluir-item {
+    background: #fff;
+    color: var(--cor-erro, #a02020);
+    border: 1px solid #e6a5a5 !important;
+  }
+
+  .btn-agendar-neste-dia {
+    width: 100%;
+    background: var(--navy);
+    color: #fff;
+    margin-top: 4px;
+    margin-bottom: 16px;
+  }
+
+  .btn-agendar-neste-dia:hover { background: var(--navy-2); }
+
+  .sem-eventos-dia {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  /* ---------- Modal novo/editar agendamento ---------- */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(20,33,61,0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  }
+
+  .modal-overlay.aberto {
+    display: flex;
+  }
+
+  .modal-conteudo {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 460px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+
+  .modal-conteudo h3 {
+    margin: 0 0 16px 0;
+    color: var(--navy);
+    font-size: 18px;
+  }
+
+  .campo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  input, select, textarea {
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 50px;
+  }
+
+  .acoes-modal {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  #btn-salvar-agendamento {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  #btn-salvar-agendamento:hover:not(:disabled) { background: var(--navy-2); }
+  #btn-salvar-agendamento:disabled { background: #9aa3b5; cursor: not-allowed; }
+
+  #btn-cancelar-modal {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid #e2e2e2;
+  }
+
+  .mensagem-erro {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fbeaea;
+    border: 1px solid #e6a5a5;
+    border-radius: 6px;
+    color: #a02020;
+    font-size: 13px;
+    display: none;
+  }
+
+  .mensagem-erro.mostrar {
+    display: block;
+  }
+
+  /* ---------- Responsivo ---------- */
+  @media (max-width: 640px) {
+    body { padding: 12px; }
+    .topo { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .topo .acoes-topo { width: 100%; }
+    .topo .acoes-topo a.btn, .topo .acoes-topo button { flex: 1; text-align: center; }
+    .filtros-agenda { flex-direction: column; align-items: stretch; }
+    .filtros-agenda select { min-width: 0; width: 100%; }
+    .navegacao-mes { justify-content: center; }
+    .dia-celula { min-height: 60px; }
+    .dia-marcadores { display: none; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .painel-dia { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="pagina">
+
+  <div class="topo">
+    <h1>Agenda</h1>
+    <div class="acoes-topo">
+      <button class="btn-primario" id="btn-novo-agendamento">+ Novo agendamento</button>
+      <button class="btn-secundario" id="btn-sair">Sair</button>
+    </div>
+  </div>
+
+  <div class="nav-abas">
+    <a href="/dashboard.html">Vouchers</a>
+    <a href="/agendamento.html" class="ativa">Agenda</a>
+  </div>
+
+  <div class="mensagem-erro" id="mensagem-erro-pagina"></div>
+
+  <div class="filtros-agenda">
+    <select id="select-transportador"></select>
+    <div class="navegacao-mes">
+      <button id="btn-mes-anterior" type="button">&lsaquo;</button>
+      <span id="label-mes"></span>
+      <button id="btn-mes-seguinte" type="button">&rsaquo;</button>
+    </div>
+  </div>
+
+  <div class="legenda">
+    <span><span class="ponto agendado"></span> Agendado (ainda sem voucher)</span>
+    <span><span class="ponto voucher"></span> Viagem com voucher</span>
+  </div>
+
+  <div class="calendario-container">
+    <div class="calendario-cabecalho-dias">
+      <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+    </div>
+    <div class="calendario-grid" id="calendario-grid"></div>
+  </div>
+
+</div>
+
+<!-- Painel lateral do dia selecionado -->
+<div class="painel-overlay" id="painel-overlay">
+  <div class="painel-dia" id="painel-dia">
+    <div class="painel-dia-cabecalho">
+      <h3 id="painel-dia-titulo"></h3>
+      <button class="painel-fechar" id="painel-fechar" type="button">&times;</button>
+    </div>
+    <button class="btn-agendar-neste-dia" id="btn-agendar-neste-dia" type="button">+ Agendar neste dia</button>
+    <div id="painel-dia-lista"></div>
+  </div>
+</div>
+
+<!-- Modal novo/editar agendamento -->
+<div class="modal-overlay" id="modal-agendamento">
+  <div class="modal-conteudo">
+    <h3 id="modal-titulo">Novo agendamento</h3>
+    <form id="form-agendamento">
+      <div class="campo-form">
+        <label for="ag_transportador_id">Transportador</label>
+        <select id="ag_transportador_id" name="transportador_id" required></select>
+      </div>
+      <div class="grid-2">
+        <div class="campo-form">
+          <label for="ag_data">Data</label>
+          <input type="date" id="ag_data" name="data" required>
+        </div>
+        <div class="campo-form">
+          <label for="ag_horario">Horário</label>
+          <input type="time" id="ag_horario" name="horario">
+        </div>
+      </div>
+      <div class="campo-form">
+        <label for="ag_cliente_nome">Nome do cliente</label>
+        <input type="text" id="ag_cliente_nome" name="cliente_nome" required>
+      </div>
+      <div class="campo-form">
+        <label for="ag_cliente_telefone">Telefone</label>
+        <input type="text" id="ag_cliente_telefone" name="cliente_telefone">
+      </div>
+      <div class="grid-2">
+        <div class="campo-form">
+          <label for="ag_origem">Origem</label>
+          <input type="text" id="ag_origem" name="origem">
+        </div>
+        <div class="campo-form">
+          <label for="ag_destino">Destino</label>
+          <input type="text" id="ag_destino" name="destino">
+        </div>
+      </div>
+      <div class="campo-form">
+        <label for="ag_observacoes">Observações</label>
+        <textarea id="ag_observacoes" name="observacoes"></textarea>
+      </div>
+
+      <div class="acoes-modal">
+        <button type="submit" id="btn-salvar-agendamento">Salvar</button>
+        <button type="button" id="btn-cancelar-modal">Cancelar</button>
+      </div>
+      <div class="mensagem-erro" id="modal-erro"></div>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { requireAuth, logout } from '/js/auth.js';
+  import { listarTransportadores } from '/js/voucher.js';
+  import { listarVouchers } from '/js/voucher.js';
+  import {
+    listarAgendamentos,
+    criarAgendamento,
+    atualizarAgendamento,
+    excluirAgendamento,
+  } from '/js/agendamento.js';
+
+  await requireAuth();
+
+  const NOMES_MES = [
+    'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+  ];
+
+  const selectTransportador = document.getElementById('select-transportador');
+  const labelMes = document.getElementById('label-mes');
+  const grid = document.getElementById('calendario-grid');
+  const btnMesAnterior = document.getElementById('btn-mes-anterior');
+  const btnMesSeguinte = document.getElementById('btn-mes-seguinte');
+  const btnSair = document.getElementById('btn-sair');
+  const btnNovoAgendamento = document.getElementById('btn-novo-agendamento');
+  const mensagemErroPagina = document.getElementById('mensagem-erro-pagina');
+
+  const painelOverlay = document.getElementById('painel-overlay');
+  const painelDiaTitulo = document.getElementById('painel-dia-titulo');
+  const painelDiaLista = document.getElementById('painel-dia-lista');
+  const painelFechar = document.getElementById('painel-fechar');
+  const btnAgendarNesteDia = document.getElementById('btn-agendar-neste-dia');
+
+  const modalOverlay = document.getElementById('modal-agendamento');
+  const modalTitulo = document.getElementById('modal-titulo');
+  const formAgendamento = document.getElementById('form-agendamento');
+  const selectAgTransportador = document.getElementById('ag_transportador_id');
+  const btnSalvarAgendamento = document.getElementById('btn-salvar-agendamento');
+  const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+  const modalErro = document.getElementById('modal-erro');
+
+  let transportadores = [];
+  let agendamentos = [];
+  let vouchers = [];
+  let idEdicaoAgendamento = null;
+  let diaSelecionadoISO = null;
+
+  const hoje = new Date();
+  let mesAtual = hoje.getMonth();
+  let anoAtual = hoje.getFullYear();
+
+  function mostrarErroPagina(mensagem) {
+    mensagemErroPagina.textContent = mensagem;
+    mensagemErroPagina.classList.add('mostrar');
+  }
+
+  function dataParaISO(date) {
+    const ano = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function formatarHorario(horario) {
+    if (!horario) return '';
+    return horario.slice(0, 5);
+  }
+
+  async function carregarTransportadores() {
+    transportadores = await listarTransportadores();
+
+    const opcaoTodos = '<option value="">Todos os transportadores</option>';
+    const opcoes = transportadores.map((t) =>
+      `<option value="${t.id}">${t.nome}${t.is_padrao ? ' (padrão)' : ''}</option>`
+    ).join('');
+
+    selectTransportador.innerHTML = opcaoTodos + opcoes;
+    selectAgTransportador.innerHTML = opcoes;
+
+    const padrao = transportadores.find((t) => t.is_padrao);
+    if (padrao) selectTransportador.value = padrao.id;
+  }
+
+  async function carregarDados() {
+    [agendamentos, vouchers] = await Promise.all([
+      listarAgendamentos(),
+      listarVouchers(),
+    ]);
+  }
+
+  function eventosDoDia(iso) {
+    const transportadorFiltro = selectTransportador.value;
+
+    const agendamentosDoDia = agendamentos.filter((a) => {
+      if (a.data !== iso) return false;
+      if (transportadorFiltro && a.transportador_id !== transportadorFiltro) return false;
+      return true;
+    });
+
+    const vouchersDoDia = vouchers.filter((v) => {
+      if (v.data_ida !== iso && v.data_volta !== iso) return false;
+      if (transportadorFiltro && v.transportador_id !== transportadorFiltro) return false;
+      return true;
+    });
+
+    return { agendamentosDoDia, vouchersDoDia };
+  }
+
+  function renderizarCalendario() {
+    labelMes.textContent = `${NOMES_MES[mesAtual]} de ${anoAtual}`;
+    grid.innerHTML = '';
+
+    const primeiroDiaSemana = new Date(anoAtual, mesAtual, 1).getDay();
+    const totalDiasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+    const isoHoje = dataParaISO(new Date());
+
+    for (let i = 0; i < primeiroDiaSemana; i++) {
+      const vazia = document.createElement('div');
+      vazia.className = 'dia-celula vazia';
+      grid.appendChild(vazia);
+    }
+
+    for (let dia = 1; dia <= totalDiasNoMes; dia++) {
+      const dataAtual = new Date(anoAtual, mesAtual, dia);
+      const iso = dataParaISO(dataAtual);
+      const { agendamentosDoDia, vouchersDoDia } = eventosDoDia(iso);
+      const temEvento = agendamentosDoDia.length > 0 || vouchersDoDia.length > 0;
+
+      const celula = document.createElement('div');
+      celula.className = 'dia-celula' + (temEvento ? ' com-evento' : '') + (iso === isoHoje ? ' hoje' : '');
+
+      const numero = document.createElement('div');
+      numero.className = 'dia-numero';
+      numero.textContent = dia;
+      celula.appendChild(numero);
+
+      const marcadores = document.createElement('div');
+      marcadores.className = 'dia-marcadores';
+
+      if (agendamentosDoDia.length > 0) {
+        const m = document.createElement('div');
+        m.className = 'marcador';
+        m.innerHTML = `<span class="ponto agendado"></span> ${agendamentosDoDia.length} agend.`;
+        marcadores.appendChild(m);
+      }
+      if (vouchersDoDia.length > 0) {
+        const m = document.createElement('div');
+        m.className = 'marcador';
+        m.innerHTML = `<span class="ponto voucher"></span> ${vouchersDoDia.length} viagem(ns)`;
+        marcadores.appendChild(m);
+      }
+      celula.appendChild(marcadores);
+
+      if (temEvento) {
+        celula.addEventListener('click', () => abrirPainelDia(iso, dataAtual));
+      }
+
+      grid.appendChild(celula);
+    }
+  }
+
+  function abrirPainelDia(iso, dataObj) {
+    diaSelecionadoISO = iso;
+    const { agendamentosDoDia, vouchersDoDia } = eventosDoDia(iso);
+
+    painelDiaTitulo.textContent = dataObj.toLocaleDateString('pt-BR', {
+      weekday: 'long', day: '2-digit', month: 'long',
+    });
+
+    painelDiaLista.innerHTML = '';
+
+    if (agendamentosDoDia.length === 0 && vouchersDoDia.length === 0) {
+      const p = document.createElement('div');
+      p.className = 'sem-eventos-dia';
+      p.textContent = 'Nada agendado neste dia ainda.';
+      painelDiaLista.appendChild(p);
+    }
+
+    agendamentosDoDia.forEach((a) => {
+      const item = document.createElement('div');
+      item.className = 'item-agenda';
+      const statusClasse = a.status === 'convertido' ? 'convertido' : 'agendado';
+      const statusTexto = a.status === 'convertido' ? 'Já é voucher' : 'Agendado';
+      item.innerHTML = `
+        <div class="item-topo">
+          <span class="item-nome">${a.cliente_nome}</span>
+          <span class="badge-status ${statusClasse}">${statusTexto}</span>
+        </div>
+        <div class="item-detalhe"><strong>Transportador:</strong> ${a.transportador?.nome ?? '—'}</div>
+        ${a.horario ? `<div class="item-detalhe"><strong>Horário:</strong> ${formatarHorario(a.horario)}</div>` : ''}
+        ${(a.origem || a.destino) ? `<div class="item-detalhe"><strong>Trajeto:</strong> ${a.origem ?? '—'} → ${a.destino ?? '—'}</div>` : ''}
+        ${a.cliente_telefone ? `<div class="item-detalhe"><strong>Telefone:</strong> ${a.cliente_telefone}</div>` : ''}
+        ${a.observacoes ? `<div class="item-detalhe"><strong>Obs.:</strong> ${a.observacoes}</div>` : ''}
+        <div class="item-acoes"></div>
+      `;
+
+      const acoes = item.querySelector('.item-acoes');
+
+      if (a.status !== 'convertido') {
+        const btnGerar = document.createElement('a');
+        btnGerar.className = 'btn-gerar-voucher';
+        btnGerar.textContent = 'Gerar voucher';
+        btnGerar.href = `/novo-voucher.html?agendamento_id=${a.id}`;
+        acoes.appendChild(btnGerar);
+
+        const btnEditar = document.createElement('button');
+        btnEditar.type = 'button';
+        btnEditar.className = 'btn-editar-item';
+        btnEditar.textContent = 'Editar';
+        btnEditar.addEventListener('click', () => abrirModalEdicao(a));
+        acoes.appendChild(btnEditar);
+
+        const btnExcluir = document.createElement('button');
+        btnExcluir.type = 'button';
+        btnExcluir.className = 'btn-excluir-item';
+        btnExcluir.textContent = 'Excluir';
+        btnExcluir.addEventListener('click', () => excluirComConfirmacao(a.id));
+        acoes.appendChild(btnExcluir);
+      } else if (a.voucher_id) {
+        const btnVerVoucher = document.createElement('a');
+        btnVerVoucher.className = 'btn-editar-item';
+        btnVerVoucher.textContent = 'Ver voucher';
+        btnVerVoucher.href = `/novo-voucher.html?id=${a.voucher_id}`;
+        acoes.appendChild(btnVerVoucher);
+      }
+
+      painelDiaLista.appendChild(item);
+    });
+
+    vouchersDoDia.forEach((v) => {
+      const item = document.createElement('div');
+      item.className = 'item-agenda';
+      item.innerHTML = `
+        <div class="item-topo">
+          <span class="item-nome">${v.cliente?.nome ?? '—'}</span>
+          <span class="badge-status voucher">Voucher n° ${v.numero}</span>
+        </div>
+        <div class="item-detalhe"><strong>Transportador:</strong> ${v.transportador?.nome ?? '—'}</div>
+        ${v.data_ida === iso ? `<div class="item-detalhe"><strong>Ida:</strong> ${v.origem_ida ?? '—'} → ${v.destino_ida ?? '—'} ${v.horario_ida ? '(' + formatarHorario(v.horario_ida) + ')' : ''}</div>` : ''}
+        ${v.data_volta === iso ? `<div class="item-detalhe"><strong>Volta:</strong> ${v.origem_volta ?? '—'} → ${v.destino_volta ?? '—'} ${v.horario_volta ? '(' + formatarHorario(v.horario_volta) + ')' : ''}</div>` : ''}
+        <div class="item-acoes">
+          <a class="btn-editar-item" href="/novo-voucher.html?id=${v.id}">Abrir voucher</a>
+        </div>
+      `;
+      painelDiaLista.appendChild(item);
+    });
+
+    painelOverlay.classList.add('aberto');
+  }
+
+  function fecharPainelDia() {
+    painelOverlay.classList.remove('aberto');
+    diaSelecionadoISO = null;
+  }
+
+  async function excluirComConfirmacao(id) {
+    if (!confirm('Excluir este agendamento? Essa ação não pode ser desfeita.')) return;
+    try {
+      await excluirAgendamento(id);
+      await recarregarTudo();
+      if (diaSelecionadoISO) {
+        const [ano, mes, dia] = diaSelecionadoISO.split('-').map(Number);
+        abrirPainelDia(diaSelecionadoISO, new Date(ano, mes - 1, dia));
+      }
+    } catch (erro) {
+      console.error(erro);
+      alert('Não foi possível excluir: ' + erro.message);
+    }
+  }
+
+  function limparFormularioModal() {
+    formAgendamento.reset();
+    modalErro.classList.remove('mostrar');
+    modalErro.textContent = '';
+    idEdicaoAgendamento = null;
+
+    const padrao = transportadores.find((t) => t.is_padrao);
+    const transportadorFiltro = selectTransportador.value;
+    selectAgTransportador.value = transportadorFiltro || padrao?.id || '';
+  }
+
+  function abrirModalNovo(isoSugerido) {
+    limparFormularioModal();
+    modalTitulo.textContent = 'Novo agendamento';
+    btnSalvarAgendamento.textContent = 'Salvar';
+    if (isoSugerido) {
+      document.getElementById('ag_data').value = isoSugerido;
+    }
+    modalOverlay.classList.add('aberto');
+  }
+
+  function abrirModalEdicao(agendamento) {
+    limparFormularioModal();
+    idEdicaoAgendamento = agendamento.id;
+    modalTitulo.textContent = 'Editar agendamento';
+    btnSalvarAgendamento.textContent = 'Salvar alterações';
+
+    selectAgTransportador.value = agendamento.transportador_id;
+    document.getElementById('ag_data').value = agendamento.data;
+    document.getElementById('ag_horario').value = agendamento.horario ?? '';
+    document.getElementById('ag_cliente_nome').value = agendamento.cliente_nome ?? '';
+    document.getElementById('ag_cliente_telefone').value = agendamento.cliente_telefone ?? '';
+    document.getElementById('ag_origem').value = agendamento.origem ?? '';
+    document.getElementById('ag_destino').value = agendamento.destino ?? '';
+    document.getElementById('ag_observacoes').value = agendamento.observacoes ?? '';
+
+    modalOverlay.classList.add('aberto');
+  }
+
+  function fecharModal() {
+    modalOverlay.classList.remove('aberto');
+  }
+
+  async function recarregarTudo() {
+    await carregarDados();
+    renderizarCalendario();
+  }
+
+  // ---------- Eventos ----------
+
+  selectTransportador.addEventListener('change', renderizarCalendario);
+
+  btnMesAnterior.addEventListener('click', () => {
+    mesAtual -= 1;
+    if (mesAtual < 0) { mesAtual = 11; anoAtual -= 1; }
+    renderizarCalendario();
+  });
+
+  btnMesSeguinte.addEventListener('click', () => {
+    mesAtual += 1;
+    if (mesAtual > 11) { mesAtual = 0; anoAtual += 1; }
+    renderizarCalendario();
+  });
+
+  btnSair.addEventListener('click', () => logout());
+
+  btnNovoAgendamento.addEventListener('click', () => abrirModalNovo(null));
+
+  btnAgendarNesteDia.addEventListener('click', () => {
+    const iso = diaSelecionadoISO;
+    fecharPainelDia();
+    abrirModalNovo(iso);
+  });
+
+  painelFechar.addEventListener('click', fecharPainelDia);
+  painelOverlay.addEventListener('click', (evento) => {
+    if (evento.target === painelOverlay) fecharPainelDia();
+  });
+
+  btnCancelarModal.addEventListener('click', fecharModal);
+  modalOverlay.addEventListener('click', (evento) => {
+    if (evento.target === modalOverlay) fecharModal();
+  });
+
+  formAgendamento.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    modalErro.classList.remove('mostrar');
+    btnSalvarAgendamento.disabled = true;
+
+    const dados = {
+      transportador_id: selectAgTransportador.value,
+      data: document.getElementById('ag_data').value,
+      horario: document.getElementById('ag_horario').value || null,
+      cliente_nome: document.getElementById('ag_cliente_nome').value.trim(),
+      cliente_telefone: document.getElementById('ag_cliente_telefone').value.trim() || null,
+      origem: document.getElementById('ag_origem').value.trim() || null,
+      destino: document.getElementById('ag_destino').value.trim() || null,
+      observacoes: document.getElementById('ag_observacoes').value.trim() || null,
+    };
+
+    try {
+      if (idEdicaoAgendamento) {
+        await atualizarAgendamento(idEdicaoAgendamento, dados);
+      } else {
+        await criarAgendamento(dados);
+      }
+      fecharModal();
+      await recarregarTudo();
+    } catch (erro) {
+      console.error(erro);
+      modalErro.textContent = 'Não foi possível salvar: ' + erro.message;
+      modalErro.classList.add('mostrar');
+    } finally {
+      btnSalvarAgendamento.disabled = false;
+    }
+  });
+
+  // ---------- Inicialização ----------
+
+  try {
+    await carregarTransportadores();
+    await carregarDados();
+    renderizarCalendario();
+  } catch (erro) {
+    console.error(erro);
+    mostrarErroPagina('Não foi possível carregar a agenda: ' + erro.message);
+  }
+</script>
+</body>
+</html>
