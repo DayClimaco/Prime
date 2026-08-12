@@ -221,6 +221,17 @@
     background: #c39640;
   }
 
+  .aviso-agendamento {
+    background: linear-gradient(135deg, #fff, #FBF3E2);
+    border: 1px solid var(--gold-light);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--navy);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
   .mensagem-erro {
     margin-top: 14px;
     padding: 10px 14px;
@@ -292,6 +303,10 @@
   <div class="topo-pagina">
     <h1 id="titulo-pagina">Novo Voucher</h1>
     <a class="btn-voltar" href="/dashboard.html">&larr; Voltar ao dashboard</a>
+  </div>
+
+  <div class="aviso-agendamento" id="aviso-agendamento" style="display:none;">
+    Preenchido a partir de um agendamento da agenda — confira os dados antes de salvar.
   </div>
 
   <form id="form-voucher">
@@ -451,6 +466,7 @@
     buscarVoucher,
   } from '/js/voucher.js';
   import { gerarPDF } from '/js/pdf-generator.js';
+  import { buscarAgendamento, marcarAgendamentoConvertido } from '/js/agendamento.js';
 
   await requireAuth(); // redireciona pro login se não houver sessão
 
@@ -468,6 +484,7 @@
   // Modo de edição: se a URL tiver ?id=xxxx, estamos editando um
   // voucher existente em vez de criar um novo.
   const idEdicao = new URLSearchParams(window.location.search).get('id');
+  const agendamentoId = new URLSearchParams(window.location.search).get('agendamento_id');
   let clienteIdEdicao = null;
 
   let transportadores = [];
@@ -502,6 +519,23 @@
     document.getElementById('motorista').value = voucher.motorista || '';
     document.getElementById('veiculo').value = voucher.veiculo || '';
     selectTransportador.value = voucher.transportador_id;
+    atualizarPreviewTransportador();
+  }
+
+  /**
+   * Preenche o formulário a partir de um agendamento (reserva rápida
+   * feita na agenda) — usado quando a página é aberta via
+   * "Gerar voucher" em /agendamento.html.
+   */
+  function preencherFormularioDeAgendamento(agendamento) {
+    document.getElementById('cliente_nome').value = agendamento.cliente_nome || '';
+    document.getElementById('cliente_telefone').value = agendamento.cliente_telefone || '';
+    document.getElementById('data_ida').value = agendamento.data || '';
+    document.getElementById('horario_ida').value = agendamento.horario || '';
+    document.getElementById('origem_ida').value = agendamento.origem || '';
+    document.getElementById('destino_ida').value = agendamento.destino || '';
+    document.getElementById('observacoes').value = agendamento.observacoes || '';
+    selectTransportador.value = agendamento.transportador_id;
     atualizarPreviewTransportador();
   }
 
@@ -588,6 +622,16 @@
         voucherSalvo = await atualizarVoucher(idEdicao, dadosVoucher);
       } else {
         voucherSalvo = await criarVoucher(dadosVoucher);
+
+        if (agendamentoId) {
+          try {
+            await marcarAgendamentoConvertido(agendamentoId, voucherSalvo.id);
+          } catch (erroAgendamento) {
+            // Não impede o fluxo: o voucher já foi salvo com sucesso,
+            // só o vínculo com o agendamento que falhou em marcar.
+            console.error('Voucher salvo, mas falhou ao marcar agendamento como convertido:', erroAgendamento);
+          }
+        }
       }
 
       spanNumero.textContent = voucherSalvo.numero;
@@ -636,6 +680,10 @@
       const voucherExistente = await buscarVoucher(idEdicao);
       clienteIdEdicao = voucherExistente.cliente_id;
       preencherFormulario(voucherExistente);
+    } else if (agendamentoId) {
+      const agendamento = await buscarAgendamento(agendamentoId);
+      preencherFormularioDeAgendamento(agendamento);
+      document.getElementById('aviso-agendamento').style.display = 'block';
     }
   }
 
