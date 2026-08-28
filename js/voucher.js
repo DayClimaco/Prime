@@ -50,40 +50,6 @@ export async function buscarOuCriarCliente({ nome, telefone }) {
 }
 
 /**
- * Atualiza os dados de um cliente já existente (usado quando se edita
- * um voucher e o nome/telefone do cliente mudou).
- */
-export async function atualizarCliente(id, { nome, telefone }) {
-  const { error } = await supabase
-    .from('clientes')
-    .update({ nome, telefone })
-    .eq('id', id);
-
-  if (error) throw error;
-}
-
-/**
- * Atualiza um voucher já existente. Usado pela tela de edição
- * (novo-voucher.html?id=...). Retorna o registro já com cliente e
- * transportador populados, pronto pra gerar PDF na sequência.
- */
-export async function atualizarVoucher(id, dados) {
-  const { data, error } = await supabase
-    .from('vouchers')
-    .update(dados)
-    .eq('id', id)
-    .select(`
-      *,
-      cliente:clientes(nome, telefone),
-      transportador:transportadores(nome, cnpj, telefone, instagram, logo_url)
-    `)
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-/**
  * Cria o voucher no banco. O campo `numero` é preenchido automaticamente
  * pela sequence configurada no schema.sql — não precisa (e não deve)
  * ser calculado aqui no front.

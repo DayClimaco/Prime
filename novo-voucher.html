@@ -4,24 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Novo Voucher — Prime Translado</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
-
-  :root {
-    --navy: #14213D;
-    --navy-2: #1D3160;
-    --gold: #D4A64A;
-    --gold-light: #F0C97A;
-  }
-
   /* Estilos específicos desta página. Regras genéricas (cores, fontes
      base) ficam em /css/style.css */
   body {
-    font-family: 'Poppins', Arial, Helvetica, sans-serif;
-    background: #F4F3EF;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
     margin: 0;
     padding: 24px;
   }
@@ -31,41 +21,21 @@
     margin: 0 auto;
   }
 
-  .topo-pagina {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
   h1 {
     font-size: 22px;
-    font-weight: 800;
-    margin: 0;
-    color: var(--navy);
-  }
-
-  .btn-voltar {
-    font-size: 13.5px;
-    font-weight: 700;
-    padding: 8px 14px;
-    border-radius: 8px;
-    background: #fff;
-    color: var(--navy);
-    text-decoration: none;
-    border: 1px solid #e2e2e2;
+    margin-bottom: 20px;
   }
 
   form {
     background: #ffffff;
-    border-radius: 14px;
-    padding: 26px;
-    box-shadow: 0 2px 10px rgba(20,33,61,0.08);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   }
 
   fieldset {
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #e2e2e2;
     padding: 16px 0;
     margin: 0 0 4px 0;
   }
@@ -76,14 +46,10 @@
 
   legend {
     font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.3px;
-    margin-bottom: 12px;
-    padding: 4px 12px;
-    color: #fff;
-    background: var(--navy);
-    border-radius: 14px;
-    display: inline-block;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 0;
+    color: #1F7A99;
   }
 
   .grid {
@@ -117,15 +83,9 @@
   input, select, textarea {
     font-size: 14px;
     padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     font-family: inherit;
-    transition: border-color 0.15s;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--gold);
   }
 
   textarea {
@@ -160,41 +120,32 @@
     font-size: 14px;
     font-weight: 700;
     padding: 10px 18px;
-    border-radius: 8px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
-    transition: background 0.15s;
   }
 
   #btn-salvar {
-    background: var(--navy);
+    background: #1F7A99;
     color: #fff;
   }
 
-  #btn-salvar:hover:not(:disabled) {
-    background: var(--navy-2);
-  }
-
   #btn-salvar:disabled {
-    background: #9aa3b5;
+    background: #9bbfcb;
     cursor: not-allowed;
   }
 
   .resultado {
     margin-top: 20px;
-    padding: 18px;
-    background: linear-gradient(135deg, #fff, #FBF3E2);
-    border: 1px solid var(--gold-light);
-    border-radius: 10px;
+    padding: 16px;
+    background: #eaf6ea;
+    border: 1px solid #b7dfb7;
+    border-radius: 6px;
     display: none;
   }
 
   .resultado.mostrar {
     display: block;
-  }
-
-  .resultado strong {
-    color: var(--navy);
   }
 
   .resultado .botoes-pdf {
@@ -204,32 +155,12 @@
   }
 
   .botoes-pdf button {
-    background: var(--navy);
+    background: #2c974b;
     color: #fff;
-  }
-
-  .botoes-pdf button:hover {
-    background: var(--navy-2);
   }
 
   .botoes-pdf button.cliente {
-    background: var(--gold);
-    color: #fff;
-  }
-
-  .botoes-pdf button.cliente:hover {
-    background: #c39640;
-  }
-
-  .aviso-agendamento {
-    background: linear-gradient(135deg, #fff, #FBF3E2);
-    border: 1px solid var(--gold-light);
-    border-radius: 10px;
-    padding: 12px 16px;
-    font-size: 13px;
-    color: var(--navy);
-    font-weight: 600;
-    margin-bottom: 16px;
+    background: #555;
   }
 
   .mensagem-erro {
@@ -245,69 +176,11 @@
   .mensagem-erro.mostrar {
     display: block;
   }
-
-  /* ---------- Responsivo (celular) ---------- */
-  @media (max-width: 640px) {
-    body {
-      padding: 12px;
-    }
-
-    .topo-pagina {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    h1 {
-      font-size: 19px;
-    }
-
-    form {
-      padding: 16px;
-      border-radius: 10px;
-    }
-
-    .grid, .grid-3 {
-      grid-template-columns: 1fr;
-    }
-
-    input, select, textarea {
-      font-size: 16px; /* evita zoom automático do iOS ao focar campo */
-    }
-
-    .acoes {
-      flex-direction: column;
-    }
-
-    .acoes button, .btn-voltar {
-      width: 100%;
-      text-align: center;
-    }
-
-    .botoes-pdf {
-      flex-direction: column;
-    }
-
-    .botoes-pdf button {
-      width: 100%;
-    }
-
-    .transportador-preview img {
-      max-height: 40px;
-    }
-  }
 </style>
 </head>
 <body>
 <div class="pagina">
-  <div class="topo-pagina">
-    <h1 id="titulo-pagina">Novo Voucher</h1>
-    <a class="btn-voltar" href="/dashboard.html">&larr; Voltar ao dashboard</a>
-  </div>
-
-  <div class="aviso-agendamento" id="aviso-agendamento" style="display:none;">
-    Preenchido a partir de um agendamento da agenda — confira os dados antes de salvar.
-  </div>
+  <h1>Novo Voucher</h1>
 
   <form id="form-voucher">
 
@@ -457,21 +330,12 @@
 
 <script type="module">
   import { requireAuth } from '/js/auth.js';
-  import {
-    listarTransportadores,
-    buscarOuCriarCliente,
-    atualizarCliente,
-    criarVoucher,
-    atualizarVoucher,
-    buscarVoucher,
-  } from '/js/voucher.js';
+  import { listarTransportadores, buscarOuCriarCliente, criarVoucher } from '/js/voucher.js';
   import { gerarPDF } from '/js/pdf-generator.js';
-  import { buscarAgendamento, marcarAgendamentoConvertido } from '/js/agendamento.js';
 
   await requireAuth(); // redireciona pro login se não houver sessão
 
   const form = document.getElementById('form-voucher');
-  const tituloPagina = document.getElementById('titulo-pagina');
   const selectTransportador = document.getElementById('transportador_id');
   const previewTransportador = document.getElementById('preview-transportador');
   const btnSalvar = document.getElementById('btn-salvar');
@@ -481,63 +345,8 @@
   const btnPdfAgencia = document.getElementById('btn-pdf-agencia');
   const btnPdfCliente = document.getElementById('btn-pdf-cliente');
 
-  // Modo de edição: se a URL tiver ?id=xxxx, estamos editando um
-  // voucher existente em vez de criar um novo.
-  const idEdicao = new URLSearchParams(window.location.search).get('id');
-  const agendamentoId = new URLSearchParams(window.location.search).get('agendamento_id');
-  let clienteIdEdicao = null;
-
   let transportadores = [];
-  let voucherSalvo = null; // guarda o voucher recém-criado/editado pra gerar o PDF
-
-  /**
-   * Preenche o formulário inteiro com os dados de um voucher existente
-   * (usado no modo de edição).
-   */
-  function preencherFormulario(voucher) {
-    document.getElementById('cliente_nome').value = voucher.cliente?.nome || '';
-    document.getElementById('cliente_telefone').value = voucher.cliente?.telefone || '';
-    document.getElementById('agencia_nome').value = voucher.agencia_nome || '';
-    document.getElementById('valor').value = voucher.valor ?? '';
-    document.getElementById('num_adultos').value = voucher.num_adultos ?? 1;
-    document.getElementById('num_criancas').value = voucher.num_criancas ?? 0;
-    document.getElementById('num_bebes').value = voucher.num_bebes ?? 0;
-    document.getElementById('servico_descricao').value = voucher.servico_descricao || '';
-    document.getElementById('data_ida').value = voucher.data_ida || '';
-    document.getElementById('origem_ida').value = voucher.origem_ida || '';
-    document.getElementById('destino_ida').value = voucher.destino_ida || '';
-    document.getElementById('horario_ida').value = voucher.horario_ida || '';
-    document.getElementById('voo_ida').value = voucher.voo_ida || '';
-    document.getElementById('data_volta').value = voucher.data_volta || '';
-    document.getElementById('origem_volta').value = voucher.origem_volta || '';
-    document.getElementById('destino_volta').value = voucher.destino_volta || '';
-    document.getElementById('horario_volta').value = voucher.horario_volta || '';
-    document.getElementById('voo_volta').value = voucher.voo_volta || '';
-    document.getElementById('observacoes').value = voucher.observacoes || '';
-    document.getElementById('atendente').value = voucher.atendente || '';
-    document.getElementById('data_atendimento').value = voucher.data_atendimento || '';
-    document.getElementById('motorista').value = voucher.motorista || '';
-    document.getElementById('veiculo').value = voucher.veiculo || '';
-    selectTransportador.value = voucher.transportador_id;
-    atualizarPreviewTransportador();
-  }
-
-  /**
-   * Preenche o formulário a partir de um agendamento (reserva rápida
-   * feita na agenda) — usado quando a página é aberta via
-   * "Gerar voucher" em /agendamento.html.
-   */
-  function preencherFormularioDeAgendamento(agendamento) {
-    document.getElementById('cliente_nome').value = agendamento.cliente_nome || '';
-    document.getElementById('cliente_telefone').value = agendamento.cliente_telefone || '';
-    document.getElementById('data_ida').value = agendamento.data || '';
-    document.getElementById('horario_ida').value = agendamento.horario || '';
-    document.getElementById('origem_ida').value = agendamento.origem || '';
-    document.getElementById('destino_ida').value = agendamento.destino || '';
-    document.getElementById('observacoes').value = agendamento.observacoes || '';
-    selectTransportador.value = agendamento.transportador_id;
-    atualizarPreviewTransportador();
-  }
+  let voucherSalvo = null; // guarda o voucher recém-criado pra gerar o PDF
 
   function mostrarErro(mensagem) {
     divErro.textContent = mensagem;
@@ -577,20 +386,10 @@
     btnSalvar.textContent = 'Salvando...';
 
     try {
-      let clienteId;
-      if (idEdicao && clienteIdEdicao) {
-        // Edição: atualiza o cliente já vinculado em vez de criar outro
-        clienteId = clienteIdEdicao;
-        await atualizarCliente(clienteId, {
-          nome: document.getElementById('cliente_nome').value.trim(),
-          telefone: document.getElementById('cliente_telefone').value.trim() || null,
-        });
-      } else {
-        clienteId = await buscarOuCriarCliente({
-          nome: document.getElementById('cliente_nome').value.trim(),
-          telefone: document.getElementById('cliente_telefone').value.trim() || null,
-        });
-      }
+      const clienteId = await buscarOuCriarCliente({
+        nome: document.getElementById('cliente_nome').value.trim(),
+        telefone: document.getElementById('cliente_telefone').value.trim() || null,
+      });
 
       const dadosVoucher = {
         cliente_id: clienteId,
@@ -618,21 +417,7 @@
         veiculo: document.getElementById('veiculo').value.trim() || null,
       };
 
-      if (idEdicao) {
-        voucherSalvo = await atualizarVoucher(idEdicao, dadosVoucher);
-      } else {
-        voucherSalvo = await criarVoucher(dadosVoucher);
-
-        if (agendamentoId) {
-          try {
-            await marcarAgendamentoConvertido(agendamentoId, voucherSalvo.id);
-          } catch (erroAgendamento) {
-            // Não impede o fluxo: o voucher já foi salvo com sucesso,
-            // só o vínculo com o agendamento que falhou em marcar.
-            console.error('Voucher salvo, mas falhou ao marcar agendamento como convertido:', erroAgendamento);
-          }
-        }
-      }
+      voucherSalvo = await criarVoucher(dadosVoucher);
 
       spanNumero.textContent = voucherSalvo.numero;
       divResultado.classList.add('mostrar');
@@ -641,7 +426,7 @@
       mostrarErro('Não foi possível salvar o voucher: ' + erro.message);
     } finally {
       btnSalvar.disabled = false;
-      btnSalvar.textContent = idEdicao ? 'Salvar alterações' : 'Salvar voucher';
+      btnSalvar.textContent = 'Salvar voucher';
     }
   });
 
@@ -671,25 +456,9 @@
     }
   });
 
-  async function iniciar() {
-    await carregarTransportadores();
-
-    if (idEdicao) {
-      tituloPagina.textContent = 'Editar Voucher';
-      btnSalvar.textContent = 'Salvar alterações';
-      const voucherExistente = await buscarVoucher(idEdicao);
-      clienteIdEdicao = voucherExistente.cliente_id;
-      preencherFormulario(voucherExistente);
-    } else if (agendamentoId) {
-      const agendamento = await buscarAgendamento(agendamentoId);
-      preencherFormularioDeAgendamento(agendamento);
-      document.getElementById('aviso-agendamento').style.display = 'block';
-    }
-  }
-
-  iniciar().catch((erro) => {
+  carregarTransportadores().catch((erro) => {
     console.error(erro);
-    mostrarErro('Não foi possível carregar os dados: ' + erro.message);
+    mostrarErro('Não foi possível carregar os transportadores: ' + erro.message);
   });
 </script>
 </body>

@@ -1,17 +1,13 @@
 // pdf-generator.js
 // ---------------------------------------------------------------------
 // Carrega /templates/voucher-template.html, popula com os dados de um
-// voucher e exporta em PDF — 100% no client, sem backend.
+// voucher e exporta em PDF usando html2pdf.js — 100% no client, sem
+// backend.
 //
-// Usa html2canvas + jsPDF diretamente (cada um com seu próprio script,
-// não o bundle do html2pdf.js — esse empacota as duas libs escondidas
-// dentro dele e não expõe window.html2canvas/window.jspdf).
+// Pré-requisito: a página que importar este módulo precisa incluir
+// o script do html2pdf antes (via CDN):
 //
-// Pré-requisito: a página que importar este módulo precisa incluir,
-// nessa ordem, ANTES do jsPDF/html2canvas serem usados:
-//
-//   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-//   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+//   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 //
 // Uso:
 //   import { gerarPDF } from './pdf-generator.js';
@@ -147,15 +143,9 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   if (tipo !== 'agencia' && tipo !== 'cliente') {
     throw new Error("tipo deve ser 'agencia' ou 'cliente'");
   }
-  if (typeof window.html2canvas !== 'function') {
+  if (typeof window.html2pdf !== 'function') {
     throw new Error(
-      'html2canvas não encontrado. Inclua o script https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js na página antes de chamar gerarPDF().'
-    );
-  }
-  const JsPDFConstructor = window.jspdf?.jsPDF || window.jsPDF;
-  if (typeof JsPDFConstructor !== 'function') {
-    throw new Error(
-      'jsPDF não encontrado. Inclua o script https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js na página antes de chamar gerarPDF().'
+      'html2pdf.js não encontrado. Inclua o script via CDN na página antes de chamar gerarPDF().'
     );
   }
 
@@ -169,35 +159,22 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   const voucherRoot = container.querySelector('#voucher-root');
   const nomeArquivo = `voucher-${voucher.numero}-${tipo}.pdf`;
 
-  // Espera as fontes (Poppins/Dancing Script) carregarem antes de
-  // renderizar. Sem isso, o layout pode mudar de tamanho no meio do
-  // processo (fonte de fallback -> fonte real) e distorcer o resultado.
-  if (document.fonts && document.fonts.ready) {
-    await document.fonts.ready;
-  }
-  await new Promise((resolve) => setTimeout(resolve, 80));
+  const opcoes = {
+    margin: 0,
+    filename: nomeArquivo,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+    // Evita que o html2pdf corte no meio de uma seção, linha de tabela
+    // ou do bloco de contatos internacionais ao quebrar de página.
+    pagebreak: {
+      mode: ['css', 'legacy'],
+      avoid: ['tr', '.secao', '.trajeto-tabela', '.contatos-internacionais', '.aviso-final'],
+    },
+  };
 
   try {
-    // 1) Desenha o voucher inteiro numa única imagem (canvas).
-    const canvas = await window.html2canvas(voucherRoot, {
-      scale: 2,
-      useCORS: true,
-      scrollX: 0,
-      scrollY: 0,
-    });
-
-    // 2) Cria um PDF com UMA página do tamanho EXATO da imagem gerada
-    // (em pixels do próprio canvas). Isso evita completamente a lógica
-    // de "fatiar em várias páginas" do html2pdf.js, que é o que estava
-    // cortando/embaralhando o voucher.
-    const imagemBase64 = canvas.toDataURL('image/jpeg', 0.98);
-    const pdf = new JsPDFConstructor({
-      orientation: 'portrait',
-      unit: 'px',
-      format: [canvas.width, canvas.height],
-    });
-    pdf.addImage(imagemBase64, 'JPEG', 0, 0, canvas.width, canvas.height);
-    pdf.save(nomeArquivo);
+    await window.html2pdf().set(opcoes).from(voucherRoot).save();
   } finally {
     container.remove();
   }
