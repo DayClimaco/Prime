@@ -108,9 +108,17 @@ async function montarContainerPopulado(voucher) {
   const templateHtml = await carregarTemplate();
 
   const container = document.createElement('div');
+  // Envelope de tamanho zero + overflow hidden: fica invisível pro usuário,
+  // mas o voucher interno continua em coordenadas normais (top:0/left:0),
+  // o que evita o bug do html2canvas de renderizar em branco quando o
+  // elemento é jogado pra fora da tela com posição negativa (ex: left:-9999px).
   container.style.position = 'fixed';
   container.style.top = '0';
-  container.style.left = '-9999px'; // fora da área visível, mas renderizado
+  container.style.left = '0';
+  container.style.width = '0';
+  container.style.height = '0';
+  container.style.overflow = 'hidden';
+  container.style.zIndex = '-1';
   container.innerHTML = templateHtml;
   document.body.appendChild(container);
 
@@ -127,6 +135,14 @@ async function montarContainerPopulado(voucher) {
   const logoEl = container.querySelector('#transportador-logo');
   if (logoEl && dados.transportador_logo_url) {
     logoEl.src = dados.transportador_logo_url;
+    // Garante que a logo termine de carregar antes do html2canvas capturar
+    // o elemento — senão a imagem pode sair em branco/faltando no PDF.
+    if (!logoEl.complete) {
+      await new Promise((resolve) => {
+        logoEl.onload = resolve;
+        logoEl.onerror = resolve; // não trava a geração se a logo falhar
+      });
+    }
   }
 
   return container;
