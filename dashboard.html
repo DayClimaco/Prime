@@ -4,12 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard — Prime Translado</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
 <link rel="stylesheet" href="/css/style.css">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --navy: #14213D;
+    --navy-2: #1D3160;
+    --gold: #D4A64A;
+    --gold-light: #F0C97A;
+  }
+
   body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    background: #F4F3EF;
     margin: 0;
     padding: 24px;
   }
@@ -28,7 +40,9 @@
 
   .topo h1 {
     font-size: 22px;
+    font-weight: 800;
     margin: 0;
+    color: var(--navy);
   }
 
   .topo .acoes-topo {
@@ -40,40 +54,74 @@
     font-size: 13.5px;
     font-weight: 700;
     padding: 9px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    transition: background 0.15s;
   }
 
   .btn-primario {
-    background: #1F7A99;
+    background: var(--navy);
     color: #fff;
   }
 
+  .btn-primario:hover {
+    background: var(--navy-2);
+  }
+
   .btn-secundario {
-    background: #eee;
-    color: #333;
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid #e2e2e2;
+  }
+
+  .nav-abas {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .nav-abas a {
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--navy);
+    background: #fff;
+    border: 1px solid #e2e2e2;
+  }
+
+  .nav-abas a.ativa {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
   }
 
   .filtros {
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
     display: flex;
     gap: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(20,33,61,0.08);
     flex-wrap: wrap;
   }
 
   .filtros input {
     font-size: 14px;
     padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-family: inherit;
+  }
+
+  .filtros input:focus {
+    outline: none;
+    border-color: var(--gold);
   }
 
   .filtros input#busca {
@@ -81,10 +129,30 @@
     min-width: 200px;
   }
 
+  .grafico-container {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(20,33,61,0.08);
+  }
+
+  .grafico-container h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+    color: var(--navy);
+  }
+
+  .grafico-vazio {
+    color: #888;
+    font-size: 13.5px;
+  }
+
   .tabela-container {
     background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(20,33,61,0.08);
     overflow-x: auto;
   }
 
@@ -102,13 +170,13 @@
   }
 
   th {
-    background: #f8f9fa;
+    background: var(--navy);
     font-weight: 700;
-    color: #444;
+    color: #fff;
   }
 
   tr:hover td {
-    background: #fafcfd;
+    background: #FBF7EE;
   }
 
   .col-acoes {
@@ -119,12 +187,23 @@
   .col-acoes button {
     padding: 6px 10px;
     font-size: 12px;
-    background: #2c974b;
+    background: var(--navy);
     color: #fff;
   }
 
   .col-acoes button.cliente {
-    background: #555;
+    background: var(--gold);
+  }
+
+  .col-acoes a.editar {
+    background: #fff;
+    color: var(--navy);
+    border: 1px solid var(--navy);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
   }
 
   .col-acoes button:disabled {
@@ -154,12 +233,63 @@
 
   .badge-transportador {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 2px 10px;
     border-radius: 10px;
-    background: #e6f2f6;
-    color: #1F7A99;
+    background: var(--navy);
+    color: var(--gold-light);
     font-size: 12px;
     font-weight: 700;
+  }
+
+  /* ---------- Responsivo (celular) ---------- */
+  @media (max-width: 640px) {
+    body {
+      padding: 12px;
+    }
+
+    .topo {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .topo h1 {
+      font-size: 19px;
+    }
+
+    .topo .acoes-topo {
+      width: 100%;
+    }
+
+    .topo .acoes-topo a.btn,
+    .topo .acoes-topo button {
+      flex: 1;
+      text-align: center;
+    }
+
+    .filtros {
+      flex-direction: column;
+    }
+
+    .filtros input#busca,
+    .filtros input[type="date"] {
+      width: 100%;
+    }
+
+    .grafico-container {
+      padding: 14px;
+    }
+
+    /* A tabela continua rolando de lado (já preparada pra isso);
+       só deixamos texto e espaçamento mais compactos */
+    th, td {
+      padding: 8px 10px;
+      font-size: 12.5px;
+    }
+
+    .col-acoes {
+      flex-wrap: nowrap;
+    }
   }
 </style>
 </head>
@@ -174,12 +304,23 @@
     </div>
   </div>
 
+  <div class="nav-abas">
+    <a href="/dashboard.html" class="ativa">Vouchers</a>
+    <a href="/agendamento.html">Agenda</a>
+  </div>
+
   <div class="mensagem-erro" id="mensagem-erro"></div>
 
   <div class="filtros">
     <input type="text" id="busca" placeholder="Buscar por cliente, agência ou transportador...">
     <input type="date" id="filtro-data-de" title="Data da ida, a partir de">
     <input type="date" id="filtro-data-ate" title="Data da ida, até">
+  </div>
+
+  <div class="grafico-container">
+    <h2>Top 10 destinos mais realizados</h2>
+    <canvas id="grafico-destinos" height="90"></canvas>
+    <div class="grafico-vazio" id="grafico-vazio" style="display:none;">Ainda não há dados suficientes.</div>
   </div>
 
   <div class="tabela-container">
@@ -284,6 +425,7 @@
         <td>${formatarValor(voucher.valor)}</td>
         <td>
           <div class="col-acoes">
+            <a class="editar" href="/novo-voucher.html?id=${voucher.id}">Editar</a>
             <button data-id="${voucher.id}" data-tipo="agencia">PDF agência</button>
             <button data-id="${voucher.id}" data-tipo="cliente" class="cliente">PDF cliente</button>
           </div>
@@ -316,6 +458,67 @@
     });
   }
 
+  function renderizarGraficoDestinos(vouchers) {
+    const canvas = document.getElementById('grafico-destinos');
+    const vazio = document.getElementById('grafico-vazio');
+
+    const contagem = {};
+    for (const v of vouchers) {
+      const destino = (v.destino_ida || '').trim();
+      if (!destino) continue;
+      const chave = destino.toLowerCase();
+      if (!contagem[chave]) contagem[chave] = { nome: destino, total: 0 };
+      contagem[chave].total += 1;
+    }
+
+    const top10 = Object.values(contagem)
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+
+    if (top10.length === 0) {
+      canvas.style.display = 'none';
+      vazio.style.display = 'block';
+      return;
+    }
+
+    canvas.style.display = 'block';
+    vazio.style.display = 'none';
+
+    new Chart(canvas, {
+      type: 'bar',
+      plugins: [ChartDataLabels],
+      data: {
+        labels: top10.map((d) => d.nome),
+        datasets: [{
+          label: 'Viagens',
+          data: top10.map((d) => d.total),
+          backgroundColor: '#14213D',
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        layout: {
+          padding: { right: 28 },
+        },
+        plugins: {
+          legend: { display: false },
+          datalabels: {
+            anchor: 'end',
+            align: 'end',
+            color: '#14213D',
+            font: { weight: '700', size: 12 },
+            formatter: (valor) => valor,
+          },
+        },
+        scales: {
+          x: { ticks: { precision: 0 }, beginAtZero: true },
+        },
+      },
+    });
+  }
+
   [inputBusca, inputDataDe, inputDataAte].forEach((el) => {
     el.addEventListener('input', renderizarTabela);
   });
@@ -326,6 +529,12 @@
     todosVouchers = await listarVouchers();
     estadoCarregando.style.display = 'none';
     renderizarTabela();
+
+    try {
+      renderizarGraficoDestinos(todosVouchers);
+    } catch (erroGrafico) {
+      console.error('Gráfico de destinos falhou (lista de vouchers carregou normalmente):', erroGrafico);
+    }
   } catch (erro) {
     console.error(erro);
     estadoCarregando.style.display = 'none';

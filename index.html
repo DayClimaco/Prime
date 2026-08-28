@@ -6,37 +6,78 @@
 <title>Login — Prime Translado</title>
 <link rel="stylesheet" href="/css/style.css">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap');
+
+  :root {
+    --navy: #14213D;
+    --navy-2: #1D3160;
+    --gold: #D4A64A;
+    --gold-light: #F0C97A;
+  }
+
   body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
+    font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 55%, var(--navy) 100%);
     margin: 0;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 16px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .card-login {
+    position: relative;
     background: #ffffff;
-    border-radius: 10px;
-    padding: 32px 28px;
+    border-radius: 18px;
+    padding: 38px 30px 30px;
     width: 100%;
     max-width: 340px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    overflow: hidden;
+  }
+
+  .accent-login {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    z-index: 0;
+  }
+
+  .card-login form, .card-login h1, .card-login .subtitulo {
+    position: relative;
+    z-index: 1;
   }
 
   .card-login h1 {
-    font-size: 19px;
+    font-size: 24px;
+    font-weight: 800;
     text-align: center;
-    margin: 0 0 4px 0;
-    color: #1F7A99;
+    margin: 0;
+    color: var(--navy);
+    letter-spacing: 0.5px;
+  }
+
+  .card-login .cursiva-login {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-family: 'Dancing Script', cursive;
+    font-size: 20px;
+    color: var(--gold);
+    margin-top: -4px;
   }
 
   .card-login .subtitulo {
     text-align: center;
-    font-size: 12.5px;
-    color: #777;
-    margin-bottom: 22px;
+    font-size: 12px;
+    color: #888;
+    margin: 10px 0 24px 0;
   }
 
   .campo-form {
@@ -53,11 +94,17 @@
   }
 
   input {
-    font-size: 14px;
+    font-size: 16px;
     padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--gold);
   }
 
   button {
@@ -65,16 +112,21 @@
     margin-top: 8px;
     font-size: 14px;
     font-weight: 700;
-    padding: 11px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 8px;
     border: none;
-    background: #1F7A99;
+    background: var(--navy);
     color: #fff;
     cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--navy-2);
   }
 
   button:disabled {
-    background: #9bbfcb;
+    background: #9aa3b5;
     cursor: not-allowed;
   }
 
@@ -97,7 +149,9 @@
 <body>
 
 <div class="card-login">
-  <h1>PRIME TRANSLADO</h1>
+  <div class="accent-login"></div>
+  <h1>VOUCHER</h1>
+  <div class="cursiva-login">de Translado</div>
   <div class="subtitulo">Acesso ao sistema de vouchers</div>
 
   <form id="form-login">
