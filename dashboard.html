@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — ALS Trip Receptivo</title>
+<title>Dashboard — Prime Translado</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
@@ -13,10 +13,10 @@
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
   :root {
-    --navy: #14532D;
-    --navy-2: #166534;
-    --gold: #22C55E;
-    --gold-light: #86EFAC;
+    --navy: #14213D;
+    --navy-2: #1D3160;
+    --gold: #D4A64A;
+    --gold-light: #F0C97A;
   }
 
   body {
@@ -176,7 +176,7 @@
   }
 
   tr:hover td {
-    background: #EAF7EE;
+    background: #FBF7EE;
   }
 
   .col-acoes {
@@ -525,7 +525,7 @@
         datasets: [{
           label: 'Viagens',
           data: top10.map((d) => d.total),
-          backgroundColor: '#14532D',
+          backgroundColor: '#14213D',
           borderRadius: 4,
         }],
       },
@@ -540,7 +540,7 @@
           datalabels: {
             anchor: 'end',
             align: 'end',
-            color: '#14532D',
+            color: '#14213D',
             font: { weight: '700', size: 12 },
             formatter: (valor) => valor,
           },
