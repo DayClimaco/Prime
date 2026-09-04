@@ -1,5 +1,5 @@
 <!--
-  VOUCHER TEMPLATE — Prime Translado (v2, redesign dourado/marinho)
+  VOUCHER TEMPLATE — ALS Trip Receptivo (v2, redesign verde moderno)
   ==================================================================
   Mesma API de sempre pro pdf-generator.js — nenhum campo de id ou
   data-field foi renomeado, só o visual mudou. Ou seja: pdf-generator.js
@@ -46,7 +46,7 @@
     <div class="cabecalho">
       <div class="cabecalho-titulo">
         <h1 class="titulo-grande">VOUCHER</h1>
-        <div class="titulo-cursiva">de Translado</div>
+        <div class="titulo-cursiva">Receptivo</div>
       </div>
       <div class="cabecalho-direita">
         <div class="badge-numero">
@@ -58,7 +58,6 @@
     </div>
 
     <div class="empresa-info">
-      <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-building" xlink:href="#ic-building"></use></svg><span><strong>CNPJ:</strong> <span data-field="transportador_cnpj" id="transportador-cnpj"></span></span></div>
       <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-phone" xlink:href="#ic-phone"></use></svg><span><strong>Tel.:</strong> <span data-field="transportador_telefone" id="transportador-telefone"></span></span></div>
       <div class="info-item"><svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-navy"><use href="#ic-camera" xlink:href="#ic-camera"></use></svg><span><strong>Instagram:</strong> <span data-field="transportador_instagram" id="transportador-instagram"></span></span></div>
     </div>
@@ -254,7 +253,7 @@
     left: -70px;
     width: 190px;
     height: 190px;
-    background: linear-gradient(135deg, #F0C97A, #D4A64A);
+    background: linear-gradient(135deg, #86EFAC, #22C55E);
   }
 
   .accent-topo-dir {
@@ -262,7 +261,7 @@
     right: -50px;
     width: 150px;
     height: 150px;
-    background: #14213D;
+    background: #14532D;
   }
 
   .corpo {
@@ -281,7 +280,7 @@
   .titulo-grande {
     font-size: 40px;
     font-weight: 800;
-    color: #14213D;
+    color: #14532D;
     margin: 0;
     letter-spacing: 1px;
     line-height: 1;
@@ -291,7 +290,7 @@
     font-family: 'Dancing Script', cursive;
     font-size: 30px;
     font-weight: 700;
-    color: #14213D;
+    color: #14532D;
     margin-top: -6px;
     margin-left: 6px;
   }
@@ -305,7 +304,7 @@
   }
 
   .badge-numero {
-    background: #14213D;
+    background: #14532D;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -342,7 +341,7 @@
 
   .linha-dourada {
     height: 2px;
-    background: linear-gradient(90deg, #D4A64A, transparent);
+    background: linear-gradient(90deg, #22C55E, transparent);
     margin: 16px 0;
   }
 
@@ -358,14 +357,14 @@
     height: 14px;
   }
 
-  .icone-navy { color: #14213D; }
-  .icone-gold { color: #D4A64A; }
+  .icone-navy { color: #14532D; }
+  .icone-gold { color: #22C55E; }
   .icone-branco { color: #ffffff; }
 
   /* ---------- Pill de seção ---------- */
   .pill-secao {
     display: inline-block;
-    background: #14213D;
+    background: #14532D;
     color: #fff;
     font-size: 13px;
     font-weight: 700;
@@ -383,7 +382,7 @@
   }
 
   .pill-secao.escura {
-    background: linear-gradient(90deg, #14213D, #1D3160);
+    background: linear-gradient(90deg, #14532D, #166534);
   }
 
   .rotulo-pill, .data-destaque {
@@ -391,7 +390,7 @@
   }
 
   .data-destaque {
-    color: #F0C97A;
+    color: #86EFAC;
     margin-left: 4px;
   }
 
@@ -416,7 +415,7 @@
 
   .rotulo-dado {
     font-weight: 700;
-    color: #14213D;
+    color: #14532D;
     white-space: nowrap;
   }
 
@@ -426,7 +425,7 @@
 
   .valor-destaque {
     font-weight: 800;
-    color: #14213D;
+    color: #14532D;
     font-size: 15px;
   }
 
@@ -460,7 +459,7 @@
   }
 
   .trajeto-tabela th {
-    background: #1D3160;
+    background: #166534;
     color: #ffffff;
     text-align: left;
     font-weight: 700;
@@ -475,7 +474,7 @@
   }
 
   .trajeto-tabela td {
-    background: #EEF2F7;
+    background: #EAF7EE;
     padding: 9px 10px;
     font-size: 13px;
     border-bottom: 1px solid #ffffff;
@@ -499,7 +498,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #14213D;
+    background: #14532D;
     color: #fff;
     font-size: 11.5px;
     text-align: center;
@@ -509,7 +508,7 @@
   }
 
   .contatos-internacionais strong {
-    color: #F0C97A;
+    color: #86EFAC;
   }
 
   /* ---------- Rodapé ---------- */
@@ -530,7 +529,7 @@
   .rodape-rotulo {
     font-size: 10px;
     font-weight: 700;
-    color: #14213D;
+    color: #14532D;
     letter-spacing: 0.3px;
   }
 
@@ -550,7 +549,7 @@
   .aviso-final-v2 {
     position: relative;
     z-index: 1;
-    background: #14213D;
+    background: #14532D;
     color: #fff;
     font-size: 11.5px;
     font-weight: 600;
@@ -563,7 +562,7 @@
   }
 
   .aviso-final-v2 strong {
-    color: #F0C97A;
+    color: #86EFAC;
   }
 
   /* ---------- Ocultar valor na versão "cliente" ---------- */
