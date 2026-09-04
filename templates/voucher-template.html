@@ -159,12 +159,14 @@
       </tbody>
     </table>
 
-    <!-- OBSERVAÇÕES -->
-    <div class="pill-secao">
-      <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-branco"><use href="#ic-chat" xlink:href="#ic-chat"></use></svg>
-      OBSERVAÇÕES
+    <!-- OBSERVAÇÕES (só aparece no PDF da agência; some no PDF do motorista) -->
+    <div class="secao-observacoes" id="secao-observacoes">
+      <div class="pill-secao">
+        <svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icone icone-branco"><use href="#ic-chat" xlink:href="#ic-chat"></use></svg>
+        OBSERVAÇÕES
+      </div>
+      <div class="observacoes-texto" data-field="observacoes" id="observacoes"></div>
     </div>
-    <div class="observacoes-texto" data-field="observacoes" id="observacoes"></div>
 
     <!-- CONTATOS INTERNACIONAIS -->
     <div class="contatos-internacionais">
@@ -438,6 +440,25 @@
     overflow: hidden;
   }
 
+  /* Origem/Destino ganham mais espaço (endereços costumam ser longos);
+     Horário/Voo ficam mais estreitos, já que o conteúdo é curto. */
+  .trajeto-tabela th:nth-child(1),
+  .trajeto-tabela td:nth-child(1),
+  .trajeto-tabela th:nth-child(2),
+  .trajeto-tabela td:nth-child(2) {
+    width: 32%;
+  }
+
+  .trajeto-tabela th:nth-child(3),
+  .trajeto-tabela td:nth-child(3) {
+    width: 15%;
+  }
+
+  .trajeto-tabela th:nth-child(4),
+  .trajeto-tabela td:nth-child(4) {
+    width: 21%;
+  }
+
   .trajeto-tabela th {
     background: #1D3160;
     color: #ffffff;
@@ -458,6 +479,10 @@
     padding: 9px 10px;
     font-size: 13px;
     border-bottom: 1px solid #ffffff;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    vertical-align: top;
   }
 
   /* ---------- Observações ---------- */
