@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard — Prime Translado</title>
+<title>Dashboard — ALS Trip Receptivo</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
@@ -13,10 +13,10 @@
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 
   :root {
-    --navy: #14213D;
-    --navy-2: #1D3160;
-    --gold: #D4A64A;
-    --gold-light: #F0C97A;
+    --navy: #14532D;
+    --navy-2: #166534;
+    --gold: #22C55E;
+    --gold-light: #86EFAC;
   }
 
   body {
@@ -176,7 +176,7 @@
   }
 
   tr:hover td {
-    background: #FBF7EE;
+    background: #EAF7EE;
   }
 
   .col-acoes {
@@ -193,6 +193,10 @@
 
   .col-acoes button.cliente {
     background: var(--gold);
+  }
+
+  .col-acoes button.excluir {
+    background: #a02020;
   }
 
   .col-acoes a.editar {
@@ -347,7 +351,7 @@
 
 <script type="module">
   import { requireAuth, logout } from '/js/auth.js';
-  import { listarVouchers } from '/js/voucher.js';
+  import { listarVouchers, excluirVoucher } from '/js/voucher.js';
   import { gerarPDF } from '/js/pdf-generator.js';
 
   await requireAuth();
@@ -428,6 +432,7 @@
             <a class="editar" href="/novo-voucher.html?id=${voucher.id}">Editar</a>
             <button data-id="${voucher.id}" data-tipo="agencia">PDF agência</button>
             <button data-id="${voucher.id}" data-tipo="cliente" class="cliente">PDF motorista</button>
+            <button data-id="${voucher.id}" class="excluir botao-excluir">Excluir</button>
           </div>
         </td>
       `;
@@ -451,6 +456,34 @@
           console.error(erro);
           mostrarErro(`Erro ao gerar PDF: ${erro.message}`);
         } finally {
+          botao.disabled = false;
+          botao.textContent = textoOriginal;
+        }
+      });
+    });
+
+    corpoTabela.querySelectorAll('button.botao-excluir').forEach((botao) => {
+      botao.addEventListener('click', async () => {
+        const id = botao.dataset.id;
+        const voucher = todosVouchers.find((v) => v.id === id);
+        if (!voucher) return;
+
+        const confirmou = window.confirm(
+          `Excluir o voucher nº ${voucher.numero} (${voucher.cliente?.nome ?? 'sem nome'})? Essa ação não pode ser desfeita.`
+        );
+        if (!confirmou) return;
+
+        botao.disabled = true;
+        const textoOriginal = botao.textContent;
+        botao.textContent = 'Excluindo...';
+
+        try {
+          await excluirVoucher(id);
+          todosVouchers = todosVouchers.filter((v) => v.id !== id);
+          renderizarTabela();
+        } catch (erro) {
+          console.error(erro);
+          mostrarErro(`Erro ao excluir voucher: ${erro.message}`);
           botao.disabled = false;
           botao.textContent = textoOriginal;
         }
@@ -492,7 +525,7 @@
         datasets: [{
           label: 'Viagens',
           data: top10.map((d) => d.total),
-          backgroundColor: '#14213D',
+          backgroundColor: '#14532D',
           borderRadius: 4,
         }],
       },
@@ -507,7 +540,7 @@
           datalabels: {
             anchor: 'end',
             align: 'end',
-            color: '#14213D',
+            color: '#14532D',
             font: { weight: '700', size: 12 },
             formatter: (valor) => valor,
           },
