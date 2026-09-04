@@ -164,6 +164,9 @@ export async function gerarPDF(voucher, tipo = 'agencia') {
   if (tipo === 'cliente') {
     const linhaValor = container.querySelector('.valor-row');
     if (linhaValor) linhaValor.style.display = 'none';
+
+    const secaoObservacoes = container.querySelector('#secao-observacoes');
+    if (secaoObservacoes) secaoObservacoes.style.display = 'none';
   }
 
   const voucherRoot = container.querySelector('#voucher-root');
